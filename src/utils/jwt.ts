@@ -3,7 +3,7 @@ import jwt, { JwtPayload } from "jsonwebtoken";
 const SECRET_KEY = "your-secret-key"; // Keep this secret in production!
 
 export const createToken = (data: object): string => {
-  return jwt.sign(data, SECRET_KEY, { expiresIn: "1m" });
+  return jwt.sign(data, SECRET_KEY, { expiresIn: "10m" });
 };
 
 export const verifyToken = (token: string): string | JwtPayload | null => {
