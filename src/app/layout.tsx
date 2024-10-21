@@ -1,17 +1,17 @@
 import type { Metadata } from "next";
-import localFont from "next/font/local";
 import "./globals.css";
 import Navigation from "@/components/navigation/Navigation";
+import { DM_Sans, Space_Grotesk } from "next/font/google";
 
-const geistSans = localFont({
-  src: "./fonts/GeistVF.woff",
-  variable: "--font-geist-sans",
-  weight: "100 900",
+const dmSans = DM_Sans({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-dm-sans",
 });
-const geistMono = localFont({
-  src: "./fonts/GeistMonoVF.woff",
-  variable: "--font-geist-mono",
-  weight: "100 900",
+const grotesk = Space_Grotesk({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-grotesk",
 });
 
 export const metadata: Metadata = {
@@ -26,10 +26,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        <Navigation>{children}</Navigation>
+      <body className={`${dmSans.variable} ${grotesk.variable} antialiased`}>
+        <div>
+          <Navigation />
+          <div>{children}</div>
+        </div>
       </body>
     </html>
   );
