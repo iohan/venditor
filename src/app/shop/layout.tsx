@@ -1,4 +1,4 @@
-import Link from "next/link";
+import SubNavigation from "@/components/sub-navigation/SubNavigation";
 
 export default function ShopLayout({
   children,
@@ -7,14 +7,21 @@ export default function ShopLayout({
 }>) {
   return (
     <div>
-      <div>
-        <Link href="/">Home</Link>
-        <Link href="/shop">Shop</Link>
-        <Link href="/blog">Blog</Link>
-      </div>
-      <div>
-        <Link href="/shop/category/beenies">Beenies</Link>
-      </div>
+      <SubNavigation
+        nav={{
+          base: "/shop/category/",
+          item: [
+            {
+              href: "beenies",
+              title: "Beenies",
+            },
+            {
+              href: "hats",
+              title: "Hats",
+            },
+          ],
+        }}
+      />
       {children}
     </div>
   );

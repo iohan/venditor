@@ -29,7 +29,7 @@ export default function RootLayout({
       <body className={`${dmSans.variable} ${grotesk.variable} antialiased`}>
         <div>
           <Navigation />
-          <div>{children}</div>
+          <div className="font-grotesk">{children}</div>
         </div>
       </body>
     </html>
