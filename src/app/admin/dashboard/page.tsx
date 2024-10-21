@@ -1,49 +1,27 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function Dashboard() {
-  const [data, setData] = useState<{
-    message: string;
-    user: { username: string };
-  }>();
   const router = useRouter();
-
-  const fetchProtectedData = useCallback(
-    async (token: string) => {
-      const res = await fetch("/api/protected", {
-        method: "GET",
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
-      if (res.ok) {
-        const data = await res.json();
-        setData(data);
-      } else {
-        router.push("/admin/sign-in"); // Redirect if the token is invalid
-      }
-    },
-    [router],
-  );
+  const { isAuthenticated, loading } = useAuth();
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
-
-    if (!token) {
-      router.push("/admin/sign-in"); // Redirect to login if token is missing
-    } else {
-      fetchProtectedData(token);
+    if (!isAuthenticated && !loading) {
+      router.push("/admin/sign-in");
     }
-  }, [fetchProtectedData, router]);
+  }, [isAuthenticated, loading, router]);
 
-  if (!data) return <p>Loading...</p>;
+  if (loading) {
+    return <>...Loading</>;
+  }
 
   return (
     <div>
       <h1>Protected Dashboard</h1>
-      <p>Welcome, {data.user.username}!</p>
-      <p>{data.message}</p>
+      <p>Welcome!</p>
     </div>
   );
 }

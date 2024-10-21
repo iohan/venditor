@@ -11,20 +11,7 @@ const Navigation = () => {
   const inAdminSection = pathname.startsWith("/admin");
 
   if (inAdminSection) {
-    if (isAuthenticated) {
-      return (
-        <div>
-          <div>
-            <Link href="/admin/sign-in">Sign in</Link>
-            <Link href="/admin/sign-up">Sign up</Link>
-            <Link href="/admin">Dashboard</Link>
-            <Link href="/admin/products">Products</Link>
-          </div>
-        </div>
-      );
-    } else {
-      return false;
-    }
+    return false;
   }
 
   return (
@@ -47,7 +34,8 @@ const Navigation = () => {
             href="/admin"
             className="flex gap-x-1 word whitespace-nowrap border border-red-100 rounded-md py-1 px-2 hover:text-amber-800 hover:border-red-300"
           >
-            <User /> Sign in
+            <User />
+            {!isAuthenticated && "Sign in"}
           </Link>
           <Link href="/shop" className="relative hover:text-amber-800">
             <ShoppingBasket />
