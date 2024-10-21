@@ -9,37 +9,31 @@ export const useAuth = () => {
   const [loading, setLoading] = useState(true);
   const router = useRouter();
 
-  const verifyToken = useCallback(
-    async (token: string) => {
-      try {
-        const res = await fetch("/api/protected", {
-          method: "GET",
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        if (res.ok) {
-          setIsAuthenticated(true);
-        } else {
-          localStorage.removeItem("token"); // Remove invalid token
-          setIsAuthenticated(false);
-          router.push("/admin/sign-in"); // Redirect to login if token is invalid
-        }
-      } catch (error: unknown) {
-        console.log(error);
+  const verifyToken = useCallback(async (token: string) => {
+    try {
+      const res = await fetch("/api/protected", {
+        method: "GET",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (res.ok) {
+        setIsAuthenticated(true);
+      } else {
+        localStorage.removeItem("token"); // Remove invalid token
         setIsAuthenticated(false);
-        router.push("/admin/sign-in");
-      } finally {
-        setLoading(false); // Stop loading state once verification is complete
       }
-    },
-    [router],
-  );
+    } catch (error: unknown) {
+      console.log(error);
+      setIsAuthenticated(false);
+    } finally {
+      setLoading(false); // Stop loading state once verification is complete
+    }
+  }, []);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) {
       setIsAuthenticated(false);
       setLoading(false);
-      router.push("/admin/sign-in"); // Redirect to login if not authenticated
     } else {
       verifyToken(token); // Check the validity of the token
     }
