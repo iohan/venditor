@@ -29,6 +29,12 @@ export const useAuth = () => {
     }
   }, []);
 
+  const signOut = () => {
+    setIsAuthenticated(false);
+    setLoading(false);
+    localStorage.removeItem("token");
+  };
+
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) {
@@ -39,5 +45,5 @@ export const useAuth = () => {
     }
   }, [router, verifyToken]);
 
-  return { isAuthenticated, loading };
+  return { isAuthenticated, loading, signOut };
 };

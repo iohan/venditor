@@ -1,4 +1,5 @@
-import { ChevronRight, Home, LayoutList } from "lucide-react";
+"use client";
+import { ChevronRight, Home, LayoutList, LogOut } from "lucide-react";
 import Link from "next/link";
 
 const AdminSideNav = () => {
@@ -28,6 +29,20 @@ const AdminSideNav = () => {
             <LayoutList size={20} className="text-amber-700/75" />
           </div>
           <div>Products</div>
+          <div className="w-full flex justify-end">
+            <ChevronRight size={18} className="text-stone-400" />
+          </div>
+        </Link>
+      </div>
+      <div className="flex flex-col gap-y-1">
+        <Link
+          href="/admin/sign-out"
+          className="flex font-bold gap-x-2 items-center hover:underline hover:text-amber-700 justify-between"
+        >
+          <div>
+            <LogOut size={20} className="text-amber-700/75" />
+          </div>
+          <div className="whitespace-nowrap">Sign out</div>
           <div className="w-full flex justify-end">
             <ChevronRight size={18} className="text-stone-400" />
           </div>
