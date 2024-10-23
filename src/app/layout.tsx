@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import Navigation from "@/components/navigation/Navigation";
 import { DM_Sans, Space_Grotesk } from "next/font/google";
 
 const dmSans = DM_Sans({
@@ -28,7 +27,6 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${dmSans.variable} ${grotesk.variable} antialiased`}>
         <div>
-          <Navigation />
           <div className="font-grotesk">{children}</div>
         </div>
       </body>

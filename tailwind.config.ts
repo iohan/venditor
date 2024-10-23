@@ -13,6 +13,9 @@ const config: Config = {
       screens: { sm: "100%", md: "100%", lg: "100%", xl: "1200px" },
     },
     extend: {
+      animation: {
+        "spin-slow": "spin 3s linear infinite",
+      },
       colors: {
         background: "var(--background)",
         foreground: "var(--foreground)",
