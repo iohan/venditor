@@ -18,7 +18,6 @@ export default function RootLayout({
     } else {
       setShowSideNav(false);
     }
-    console.log(isAuthenticated, loading);
   }, [isAuthenticated, loading]);
 
   if (loading) {
@@ -31,7 +30,7 @@ export default function RootLayout({
   return (
     <div className="flex h-screen">
       {showSideNav && <AdminSideNav />}
-      <div className="p-10">{children}</div>
+      <div className="p-10 w-full">{children}</div>
     </div>
   );
 }

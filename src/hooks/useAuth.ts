@@ -1,13 +1,10 @@
-// hooks/useAuth.ts
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 
 export const useAuth = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true);
-  const router = useRouter();
 
   const verifyToken = useCallback(async (token: string) => {
     try {
@@ -18,14 +15,14 @@ export const useAuth = () => {
       if (res.ok) {
         setIsAuthenticated(true);
       } else {
-        localStorage.removeItem("token"); // Remove invalid token
+        localStorage.removeItem("token");
         setIsAuthenticated(false);
       }
     } catch (error: unknown) {
       console.log(error);
       setIsAuthenticated(false);
     } finally {
-      setLoading(false); // Stop loading state once verification is complete
+      setLoading(false);
     }
   }, []);
 
@@ -43,7 +40,7 @@ export const useAuth = () => {
     } else {
       verifyToken(token); // Check the validity of the token
     }
-  }, [router, verifyToken]);
+  }, [verifyToken]);
 
   return { isAuthenticated, loading, signOut };
 };
