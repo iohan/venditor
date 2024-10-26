@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { DM_Sans, Space_Grotesk } from "next/font/google";
+import Providers from "./providers";
 
 const dmSans = DM_Sans({
   subsets: ["latin"],
@@ -26,9 +27,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${dmSans.variable} ${grotesk.variable} antialiased`}>
-        <div>
-          <div className="font-grotesk">{children}</div>
-        </div>
+        <Providers>
+          <div>
+            <div className="font-grotesk">{children}</div>
+          </div>
+        </Providers>
       </body>
     </html>
   );
