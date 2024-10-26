@@ -1,10 +1,14 @@
 import { cx } from "@/utils/cx";
 
 const InputText = ({
+  value,
+  onChange,
   label,
   className,
   placeholder,
 }: {
+  value: string;
+  onChange: (value: string) => void;
   label?: string;
   placeholder?: string;
   className?: string;
@@ -15,6 +19,8 @@ const InputText = ({
       <input
         placeholder={placeholder}
         type="text"
+        value={value}
+        onChange={(event) => onChange(event.target.value)}
         className={cx(
           "bg-gray-200 rounded-lg text-sm text-gray-800 p-3 outline-none",
           className,

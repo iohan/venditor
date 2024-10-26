@@ -18,10 +18,45 @@ import productMan from "@/images/product-man-beenie.webp";
 import productBeenie1 from "@/images/product-beenie.webp";
 import productBeenie2 from "@/images/product-beenie2.webp";
 import Dropdown from "@/components/form/Dropdown";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useEffect, useState } from "react";
+import { Product } from "@prisma/client";
 
 export default function AddProduct() {
   const { isAuthenticated, loading } = useAuth();
   const router = useRouter();
+  const queryClient = useQueryClient();
+  const [productData, setProductData] = useState<Omit<Product, "id">>();
+
+  const mutation = useMutation({
+    // TODO: Make a Mutate type that Omit id from a type
+    mutationFn: async (data: Omit<Product, "id">) => {
+      const response = await fetch("/api/add-product", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+      return response;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["tasks"] });
+    },
+  });
+  useEffect(() => {
+    console.log("Product", productData);
+  }, [productData]);
+  const onAddProduct = () => {
+    // TODO: Validation with ZOD
+
+    mutation.mutate({
+      title: productData?.title ?? "",
+      description: productData?.description ?? "",
+      draft: false,
+      categoryId: 1,
+    });
+  };
 
   if (loading) {
     return <p>Loading...</p>;
@@ -46,11 +81,7 @@ export default function AddProduct() {
           >
             Save Draft
           </Button>
-          <Button
-            primary
-            icon={Check}
-            onClick={() => console.log("Add product")}
-          >
+          <Button primary icon={Check} onClick={onAddProduct}>
             Add Product
           </Button>
         </div>
@@ -61,7 +92,19 @@ export default function AddProduct() {
             <div className="font-semibold text-lg mb-2">
               General Information
             </div>
-            <InputText label="Productname" placeholder="Productname" />
+            <InputText
+              label="Productname"
+              placeholder="Productname"
+              value={productData?.title ?? ""}
+              onChange={(value) =>
+                setProductData((prevState) => ({
+                  title: value,
+                  description: prevState?.description ?? "",
+                  draft: prevState?.draft ?? false,
+                  categoryId: prevState?.categoryId ?? 1,
+                }))
+              }
+            />
             <TextArea label="Productdescription" />
             <div className="flex gap-5">
               <div className="basis-full flex justify-center items-center text-gray-500 font-semibold animate-pulse bg-gray-200 rounded-lg h-20">
@@ -78,12 +121,32 @@ export default function AddProduct() {
           <ContainerBox>
             <div className="font-semibold text-lg mb-2">Pricing and stock</div>
             <div className="flex gap-3 basis-full">
-              <InputText label="Base pricing" placeholder="Base pricing" />
-              <InputText label="Stock" placeholder="Stock" />
+              <InputText
+                value={""}
+                onChange={() => false}
+                label="Base pricing"
+                placeholder="Base pricing"
+              />
+              <InputText
+                value={""}
+                onChange={() => false}
+                label="Stock"
+                placeholder="Stock"
+              />
             </div>
             <div className="flex gap-3 basis-full">
-              <InputText label="Discount" placeholder="Discount" />
-              <InputText label="SKU" placeholder="SKU" />
+              <InputText
+                value={""}
+                onChange={() => false}
+                label="Discount"
+                placeholder="Discount"
+              />
+              <InputText
+                value={""}
+                onChange={() => false}
+                label="SKU"
+                placeholder="SKU"
+              />
             </div>
           </ContainerBox>
         </div>
@@ -154,7 +217,11 @@ export default function AddProduct() {
                 <SquareX className="text-amber-700" size={13} />
               </div>
             </div>
-            <InputText placeholder="Category name" />
+            <InputText
+              value={""}
+              onChange={() => false}
+              placeholder="Category name"
+            />
             <Button primary onClick={() => console.log("Add category")}>
               Add new Category
             </Button>
