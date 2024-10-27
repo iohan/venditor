@@ -18,43 +18,84 @@ import productMan from "@/images/product-man-beenie.webp";
 import productBeenie1 from "@/images/product-beenie.webp";
 import productBeenie2 from "@/images/product-beenie2.webp";
 import Dropdown from "@/components/form/Dropdown";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
+import { ChangeEvent, useEffect, useState } from "react";
 import { Product } from "@prisma/client";
+import { addProduct, getSignedURL } from "./actions";
+import { computeFileChecksum } from "@/utils/compute-file-checksum";
 
 export default function AddProduct() {
   const { isAuthenticated, loading } = useAuth();
   const router = useRouter();
-  const queryClient = useQueryClient();
-  const [productData, setProductData] = useState<Omit<Product, "id">>();
+  const [productData, setProductData] =
+    useState<Pick<Product, "title" | "description" | "draft" | "categoryId">>();
+  const [file, setFile] = useState<File | undefined>(undefined);
+  const [fileUrl, setFileUrl] = useState<string | undefined>(undefined);
 
-  const mutation = useMutation({
-    // TODO: Make a Mutate type that Omit id from a type
-    mutationFn: async (data: Omit<Product, "id">) => {
-      const response = await fetch("/api/add-product", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      });
-      return response;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["tasks"] });
-    },
-  });
   useEffect(() => {
     console.log("Product", productData);
   }, [productData]);
-  const onAddProduct = () => {
+
+  const handleImageOnChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const uploadedFile = e.target.files?.[0];
+    setFile(uploadedFile);
+
+    if (fileUrl) {
+      URL.revokeObjectURL(fileUrl);
+    }
+
+    if (uploadedFile) {
+      setFileUrl(URL.createObjectURL(uploadedFile));
+    } else {
+      setFileUrl(undefined);
+    }
+  };
+
+  const onAddProduct = async () => {
     // TODO: Validation with ZOD
 
-    mutation.mutate({
+    console.log(productData);
+    console.log(file);
+    let mediaObjId: number | undefined = undefined;
+    if (file) {
+      try {
+        console.log("Uploading file");
+        const checksum = await computeFileChecksum(file);
+
+        const signedUrlResult = await getSignedURL(
+          file.type,
+          file.size,
+          checksum,
+        );
+
+        if (signedUrlResult.failure !== undefined) {
+          throw new Error(signedUrlResult.failure);
+        }
+
+        const { url, mediaId } = signedUrlResult.success;
+        mediaObjId = mediaId;
+        console.log("SIGNED", url, mediaId);
+
+        await fetch(url, {
+          method: "PUT",
+          body: file,
+          headers: {
+            "Content-Type": file.type,
+          },
+        });
+
+        console.log("File uploaded");
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    await addProduct({
       title: productData?.title ?? "",
       description: productData?.description ?? "",
       draft: false,
       categoryId: 1,
+      shopId: 1,
+      mediaId: mediaObjId,
     });
   };
 
@@ -153,13 +194,21 @@ export default function AddProduct() {
         <div className="basis-1/3 flex flex-col gap-5">
           <ContainerBox>
             <div className="font-semibold text-lg">Upload Img</div>
-            <div className="flex-grow relative h-[300px] rounded-lg overflow-hidden">
-              <Image
-                src={productMan}
-                alt="Picture of the author"
-                className="absolute inset-0 object-cover w-full h-full"
-              />
-            </div>
+            <input
+              type="file"
+              name="media"
+              accept="image/jpeg,image/png, image/webp, image/gif, video/mp4, video/webm"
+              onChange={handleImageOnChange}
+            />
+            {fileUrl && file && (
+              <div className="flex-grow relative h-[300px] rounded-lg overflow-hidden">
+                <img
+                  src={fileUrl}
+                  alt="Picture of the author"
+                  className="absolute inset-0 object-cover w-full h-full"
+                />
+              </div>
+            )}
             <div className="flex gap-2">
               <div className="flex-grow relative basis-1/4 aspect-square rounded-lg overflow-hidden">
                 <Image

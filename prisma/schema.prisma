@@ -7,17 +7,48 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model Shop {
+  id              Int               @id @default(autoincrement())
+  title           String
+  ProductCategory ProductCategory[]
+  Product         Product[]
+  Media           Media[]
+}
+
 model ProductCategory {
   id       Int       @id @default(autoincrement())
   title    String
   products Product[]
+  shop     Shop      @relation(fields: [shopId], references: [id])
+  shopId   Int
 }
 
 model Product {
-  id          Int             @id @default(autoincrement())
-  title       String
-  description String?
-  draft       Boolean         @default(true)
-  category    ProductCategory @relation(fields: [categoryId], references: [id])
-  categoryId  Int
+  id           Int             @id @default(autoincrement())
+  title        String
+  description  String?
+  draft        Boolean         @default(true)
+  category     ProductCategory @relation(fields: [categoryId], references: [id])
+  categoryId   Int
+  shop         Shop            @relation(fields: [shopId], references: [id])
+  shopId       Int
+  ProductMedia ProductMedia[]
+}
+
+model ProductMedia {
+  product   Product @relation(fields: [productId], references: [id])
+  productId Int
+  media     Media   @relation(fields: [mediaId], references: [id])
+  mediaId   Int
+
+  @@id([productId, mediaId])
+}
+
+model Media {
+  id           Int            @id @default(autoincrement())
+  type         String
+  url          String
+  shop         Shop           @relation(fields: [shopId], references: [id])
+  shopId       Int
+  ProductMedia ProductMedia[]
 }
