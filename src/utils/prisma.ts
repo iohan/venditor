@@ -1,17 +1,8 @@
-import { PrismaClient } from "@prisma/client";
-import { Pool, neonConfig } from "@neondatabase/serverless";
-import { PrismaNeon } from "@prisma/adapter-neon";
-import dotenv from "dotenv";
-import ws from "ws";
-
-dotenv.config();
-neonConfig.webSocketConstructor = ws;
-const connectionString = `${process.env.DATABASE_URL}`;
-const pool = new Pool({ connectionString });
-const adapter = new PrismaNeon(pool);
+import { PrismaClient } from "@prisma/client/edge";
+import { withAccelerate } from "@prisma/extension-accelerate";
 
 const prismaClientSingleton = () => {
-  return new PrismaClient({ adapter });
+  return new PrismaClient().$extends(withAccelerate());
 };
 
 declare const globalThis: {
