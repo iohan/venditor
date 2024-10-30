@@ -1,20 +1,15 @@
 "use client";
 
-import { useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { useAuth } from "@/hooks/useAuth";
+import { redirect } from "next/navigation";
+import { useSession } from "next-auth/react";
 
 export default function Dashboard() {
-  const router = useRouter();
-  const { isAuthenticated, loading } = useAuth();
+  const session = useSession();
+  if (!session) {
+    redirect("/api/auth/signin");
+  }
 
-  useEffect(() => {
-    if (!isAuthenticated && !loading) {
-      router.push("/admin/sign-in");
-    }
-  }, [isAuthenticated, loading, router]);
-
-  if (loading) {
+  if (session.status === "loading") {
     return <>...Loading</>;
   }
 
