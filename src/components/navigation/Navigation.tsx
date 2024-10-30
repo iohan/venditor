@@ -5,6 +5,7 @@ import { cx } from "@/utils/cx";
 import { ShoppingBasket, User } from "lucide-react";
 import Link from "next/link";
 import Spinner from "../spinner/Spinner";
+import { signIn } from "next-auth/react";
 
 const Navigation = ({ pathname }: { pathname: string }) => {
   const { isAuthenticated, loading } = useAuth();
@@ -53,13 +54,13 @@ const Navigation = ({ pathname }: { pathname: string }) => {
               <Spinner />
             </div>
           ) : (
-            <Link
-              href="/admin"
+            <button
+              onClick={() => signIn()}
               className="flex gap-x-1 word whitespace-nowrap border border-red-100 rounded-md py-1 px-2 hover:text-amber-800 hover:border-red-300"
             >
               <User />
               {!isAuthenticated && "Sign in"}
-            </Link>
+            </button>
           )}
           <Link href="/cart" className="relative hover:text-amber-800">
             <ShoppingBasket />
