@@ -1,9 +1,8 @@
 "use client";
 
-import { useAuth } from "@/hooks/useAuth";
 import ContainerBox from "../../_components/ContainerBox";
 import InputText from "@/components/form/InputText";
-import { useRouter } from "next/navigation";
+import { redirect } from "next/navigation";
 import TextArea from "@/components/form/TextArea";
 import {
   BookDashed,
@@ -20,16 +19,21 @@ import productBeenie2 from "@/images/product-beenie2.webp";
 import Dropdown from "@/components/form/Dropdown";
 import { ChangeEvent, useEffect, useState } from "react";
 import { Product } from "@prisma/client";
-import { addProduct, getSignedURL } from "./actions";
 import { computeFileChecksum } from "@/utils/compute-file-checksum";
+import { useSession } from "next-auth/react";
+import { getSignedURL } from "@/data-layer/media";
+import { addProduct } from "@/data-layer/product";
 
 export default function AddProduct() {
-  const { isAuthenticated, loading } = useAuth();
-  const router = useRouter();
   const [productData, setProductData] =
     useState<Pick<Product, "title" | "description" | "draft" | "categoryId">>();
   const [file, setFile] = useState<File | undefined>(undefined);
   const [fileUrl, setFileUrl] = useState<string | undefined>(undefined);
+
+  const session = useSession();
+  if (session.status === "unauthenticated") {
+    redirect("/api/auth/signin");
+  }
 
   useEffect(() => {
     console.log("Product", productData);
@@ -53,8 +57,6 @@ export default function AddProduct() {
   const onAddProduct = async () => {
     // TODO: Validation with ZOD
 
-    console.log(productData);
-    console.log(file);
     let mediaObjId: number | undefined = undefined;
     if (file) {
       try {
@@ -99,12 +101,8 @@ export default function AddProduct() {
     });
   };
 
-  if (loading) {
-    return <p>Loading...</p>;
-  }
-
-  if (!isAuthenticated) {
-    router.push("/admin/sign-in");
+  if (session.status === "loading") {
+    return <>...Loading</>;
   }
 
   return (

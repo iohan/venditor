@@ -1,13 +1,11 @@
 "use server";
 
+import { auth } from "@/utils/auth";
 import { generateUniqueFileName } from "@/utils/generate-unique-file-name";
 import prisma from "@/utils/prisma";
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
-import { Product } from "@prisma/client";
-
-// TODO: Implement next auth
-// import { auth } from "@/auth"
+import { redirect } from "next/navigation";
 
 const s3 = new S3Client({
   region: process.env.AWS_BUCKET_REGION ?? "",
@@ -33,13 +31,11 @@ export const getSignedURL = async (
   size: number,
   checksum: string,
 ) => {
-  // TODO: Check auth
-  // const session = await auth()
-  // if (!session) {
-  //    return { failure: "Not authenticated" }
-  // }
-  //
-  //
+  const session = await auth();
+
+  if (!session) {
+    redirect("/api/auth/signin");
+  }
 
   if (!acceptedTypes.includes(type)) {
     return { failure: "Invalid file type" };
@@ -72,29 +68,4 @@ export const getSignedURL = async (
   });
 
   return { success: { url: signedUrl, mediaId: newMediaRef.id } };
-};
-
-export const addProduct = async (
-  data: Omit<Product, "id"> & { mediaId?: number },
-) => {
-  const newProduct = await prisma.product.create({
-    data: {
-      title: data.title,
-      description: data.description,
-      draft: data.draft,
-      shopId: data.shopId,
-      categoryId: data.categoryId,
-    },
-  });
-
-  if (data.mediaId !== undefined && newProduct) {
-    const productId = newProduct.id;
-
-    await prisma.productMedia.create({
-      data: {
-        productId,
-        mediaId: data.mediaId,
-      },
-    });
-  }
 };

@@ -1,19 +1,13 @@
 "use client";
 
-import { useAuth } from "@/hooks/useAuth";
 import { cx } from "@/utils/cx";
 import { ShoppingBasket, User } from "lucide-react";
 import Link from "next/link";
-import Spinner from "../spinner/Spinner";
-import { signIn } from "next-auth/react";
+import { signIn, useSession } from "next-auth/react";
+import Spinner from "@/components/spinner/Spinner";
 
 const Navigation = ({ pathname }: { pathname: string }) => {
-  const { isAuthenticated, loading } = useAuth();
-  const inAdminSection = pathname.startsWith("/admin");
-
-  if (inAdminSection) {
-    return false;
-  }
+  const { status } = useSession();
 
   const links = [
     {
@@ -49,17 +43,24 @@ const Navigation = ({ pathname }: { pathname: string }) => {
           ))}
         </div>
         <div className="font-bold flex gap-x-2 items-center">
-          {loading ? (
+          {status === "loading" ? (
             <div className="py-1 px-2 border border-transparent">
               <Spinner />
             </div>
-          ) : (
-            <button
-              onClick={() => signIn()}
+          ) : status === "authenticated" ? (
+            <Link
+              href={"/admin"}
               className="flex gap-x-1 word whitespace-nowrap border border-red-100 rounded-md py-1 px-2 hover:text-amber-800 hover:border-red-300"
             >
               <User />
-              {!isAuthenticated && "Sign in"}
+            </Link>
+          ) : (
+            <button
+              onClick={() => signIn("github", { redirectTo: "/admin" })}
+              className="flex gap-x-1 word whitespace-nowrap border border-red-100 rounded-md py-1 px-2 hover:text-amber-800 hover:border-red-300"
+            >
+              <User />
+              Sign in
             </button>
           )}
           <Link href="/cart" className="relative hover:text-amber-800">

@@ -1,15 +1,11 @@
-"use client";
-import { useAuth } from "@/hooks/useAuth";
+import { auth } from "@/utils/auth";
+import { redirect } from "next/navigation";
 
-export default function Products() {
-  const { isAuthenticated, loading } = useAuth();
+export default async function Products() {
+  const session = await auth();
 
-  if (loading) {
-    return <p>Loading...</p>;
-  }
-
-  if (!isAuthenticated) {
-    return null;
+  if (!session) {
+    redirect("/api/auth/signin");
   }
 
   return <>Products</>;
