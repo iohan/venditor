@@ -1,36 +1,20 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# .venditor, an e-commerce PIM
+An efficient, scalable, and secure Product Information Management (PIM) system for e-commerce platforms. Built using modern technologies to handle product data, user authentication, and database interactions with high performance.
 
-## Getting Started
+## Table of Contents
+[About the Project](#about-the-project)
+[Tech Stack](#tech-stack)
 
-First, run the development server:
+## About the Project
+The E-commerce PIM system is designed to simplify managing product data across multiple e-commerce platforms. With a focus on speed, scalability, and ease of use, it offers a centralized location for handling product information, inventory, categories, and more.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+### Key Objectives
+- **Centralized Product Management:** Easily manage product details, images, and inventory.
+- **High Performance:** Leveraging Prisma Accelerate and Neon Postgres to ensure fast and efficient data handling.
+- **Scalable Authentication:** Powered by NextAuth for secure and reliable user authentication.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Tech Stack
+- **Frontend & backend:** Next.js, Typescript and TailwindCSS
+- **Database:** Neon Postgres (PostgreSQL optimized for serverless and real-time applications)
+- **ORM:** Prisma with Prisma Accelerate for optimized data access
+- **Authentication:** NextAuth for session management and secure authentication
