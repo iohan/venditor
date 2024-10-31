@@ -3,27 +3,24 @@
 import ContainerBox from "../../_components/ContainerBox";
 import InputText from "@/components/form/InputText";
 import { redirect } from "next/navigation";
-import {
-  BookDashed,
-  Check,
-  CirclePlus,
-  LayoutList,
-  SquareX,
-} from "lucide-react";
+import { BookDashed, Check, CirclePlus, LayoutList } from "lucide-react";
 import Button from "@/components/button/Button";
 import Image from "next/image";
 import productMan from "@/images/product-man-beenie.webp";
 import productBeenie1 from "@/images/product-beenie.webp";
 import productBeenie2 from "@/images/product-beenie2.webp";
-import Dropdown from "@/components/form/Dropdown";
 import { ChangeEvent, FormEvent, useState } from "react";
 import { useSession } from "next-auth/react";
 import GeneralInfo from "./GeneralInfo";
 import { submitNewProduct } from "./actions";
+import SelectCategory from "./SelectCategory";
 
 export default function AddProduct() {
   const [file, setFile] = useState<File | undefined>(undefined);
   const [fileUrl, setFileUrl] = useState<string | undefined>(undefined);
+  const [selectedCategory, setSelectedCategory] = useState<
+    { id?: number; title: string }[]
+  >([]);
 
   const session = useSession();
   if (session.status === "unauthenticated") {
@@ -46,6 +43,7 @@ export default function AddProduct() {
   };
 
   const handleOnSubmit = async (evt: FormEvent<HTMLFormElement>) => {
+    // TODO: Use ReactHookForms and form-validation.ts
     evt.preventDefault();
 
     try {
@@ -154,41 +152,10 @@ export default function AddProduct() {
               </div>
             </div>
           </ContainerBox>
-          <ContainerBox>
-            <div className="font-semibold text-lg">Category</div>
-            <Dropdown
-              options={[
-                { label: "Beenies", value: "beenies" },
-                { label: "Hats", value: "hats" },
-                { label: "Cap", value: "cap" },
-                { label: "Stetson", value: "stetson" },
-                { label: "Test", value: "test" },
-              ]}
-              onChange={(val) => console.log("Select: ", val)}
-            />
-            <div className="flex text-sm gap-2">
-              <div className="flex items-center gap-x-1 hover:underline cursor-pointer">
-                <span>Beenies</span>
-                <SquareX className="text-amber-700" size={13} />
-              </div>
-              <div className="flex items-center gap-x-1 hover:underline cursor-pointer">
-                <span>Hats</span>
-                <SquareX className="text-amber-700" size={13} />
-              </div>
-              <div className="flex items-center gap-x-1 hover:underline cursor-pointer">
-                <span>Category</span>
-                <SquareX className="text-amber-700" size={13} />
-              </div>
-              <div className="flex items-center gap-x-1 hover:underline cursor-pointer">
-                <span>Test</span>
-                <SquareX className="text-amber-700" size={13} />
-              </div>
-            </div>
-            <InputText name="category_name" placeholder="Category name" />
-            <Button primary onClick={() => console.log("Add category")}>
-              Add new Category
-            </Button>
-          </ContainerBox>
+          <SelectCategory
+            selectedCategories={selectedCategory}
+            setSelectedCategories={setSelectedCategory}
+          />
         </div>
       </div>
     </form>
