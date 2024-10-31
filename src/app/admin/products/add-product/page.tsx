@@ -3,7 +3,6 @@
 import ContainerBox from "../../_components/ContainerBox";
 import InputText from "@/components/form/InputText";
 import { redirect } from "next/navigation";
-import TextArea from "@/components/form/TextArea";
 import {
   BookDashed,
   Check,
@@ -17,16 +16,12 @@ import productMan from "@/images/product-man-beenie.webp";
 import productBeenie1 from "@/images/product-beenie.webp";
 import productBeenie2 from "@/images/product-beenie2.webp";
 import Dropdown from "@/components/form/Dropdown";
-import { ChangeEvent, useEffect, useState } from "react";
-import { Product } from "@prisma/client";
-import { computeFileChecksum } from "@/utils/compute-file-checksum";
+import { ChangeEvent, FormEvent, useState } from "react";
 import { useSession } from "next-auth/react";
-import { getSignedURL } from "@/data-layer/media";
-import { addProduct } from "@/data-layer/product";
+import GeneralInfo from "./GeneralInfo";
+import { submitNewProduct } from "./actions";
 
 export default function AddProduct() {
-  const [productData, setProductData] =
-    useState<Pick<Product, "title" | "description" | "draft" | "categoryId">>();
   const [file, setFile] = useState<File | undefined>(undefined);
   const [fileUrl, setFileUrl] = useState<string | undefined>(undefined);
 
@@ -34,10 +29,6 @@ export default function AddProduct() {
   if (session.status === "unauthenticated") {
     redirect("/api/auth/signin");
   }
-
-  useEffect(() => {
-    console.log("Product", productData);
-  }, [productData]);
 
   const handleImageOnChange = (e: ChangeEvent<HTMLInputElement>) => {
     const uploadedFile = e.target.files?.[0];
@@ -54,51 +45,21 @@ export default function AddProduct() {
     }
   };
 
-  const onAddProduct = async () => {
-    // TODO: Validation with ZOD
+  const handleOnSubmit = async (evt: FormEvent<HTMLFormElement>) => {
+    evt.preventDefault();
 
-    let mediaObjId: number | undefined = undefined;
-    if (file) {
-      try {
-        console.log("Uploading file");
-        const checksum = await computeFileChecksum(file);
+    try {
+      const formData = new FormData(evt.currentTarget);
 
-        const signedUrlResult = await getSignedURL(
-          file.type,
-          file.size,
-          checksum,
-        );
-
-        if (signedUrlResult.failure !== undefined) {
-          throw new Error(signedUrlResult.failure);
-        }
-
-        const { url, mediaId } = signedUrlResult.success;
-        mediaObjId = mediaId;
-        console.log("SIGNED", url, mediaId);
-
-        await fetch(url, {
-          method: "PUT",
-          body: file,
-          headers: {
-            "Content-Type": file.type,
-          },
-        });
-
-        console.log("File uploaded");
-      } catch (e) {
-        console.error(e);
+      const response = await submitNewProduct(formData);
+      console.log(response);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      if (evt.currentTarget) {
+        evt.currentTarget.reset();
       }
     }
-
-    await addProduct({
-      title: productData?.title ?? "",
-      description: productData?.description ?? "",
-      draft: false,
-      categoryId: 1,
-      shopId: 1,
-      mediaId: mediaObjId,
-    });
   };
 
   if (session.status === "loading") {
@@ -106,7 +67,7 @@ export default function AddProduct() {
   }
 
   return (
-    <div>
+    <form onSubmit={handleOnSubmit}>
       <div className="flex justify-between mb-5">
         <div className="flex gap-2 items-center">
           <LayoutList size={20} className="text-amber-700/75" />
@@ -120,72 +81,31 @@ export default function AddProduct() {
           >
             Save Draft
           </Button>
-          <Button primary icon={Check} onClick={onAddProduct}>
+          <Button primary icon={Check} type="submit">
             Add Product
           </Button>
         </div>
       </div>
       <div className="flex gap-5">
         <div className="basis-2/3 flex flex-col gap-5">
-          <ContainerBox>
-            <div className="font-semibold text-lg mb-2">
-              General Information
-            </div>
-            <InputText
-              label="Productname"
-              placeholder="Productname"
-              value={productData?.title ?? ""}
-              onChange={(value) =>
-                setProductData((prevState) => ({
-                  title: value,
-                  description: prevState?.description ?? "",
-                  draft: prevState?.draft ?? false,
-                  categoryId: prevState?.categoryId ?? 1,
-                }))
-              }
-            />
-            <TextArea label="Productdescription" />
-            <div className="flex gap-5">
-              <div className="basis-full flex justify-center items-center text-gray-500 font-semibold animate-pulse bg-gray-200 rounded-lg h-20">
-                <span>Additional setting</span>
-              </div>
-              <div className="basis-full flex justify-center items-center text-gray-500 font-semibold animate-pulse bg-gray-200 rounded-lg h-20">
-                <span>Additional setting</span>
-              </div>
-              <div className="basis-full flex justify-center items-center text-gray-500 font-semibold animate-pulse bg-gray-200 rounded-lg h-20">
-                <span>Additional setting</span>
-              </div>
-            </div>
-          </ContainerBox>
+          <GeneralInfo />
           <ContainerBox>
             <div className="font-semibold text-lg mb-2">Pricing and stock</div>
             <div className="flex gap-3 basis-full">
               <InputText
-                value={""}
-                onChange={() => false}
+                name="base_price"
                 label="Base pricing"
                 placeholder="Base pricing"
               />
-              <InputText
-                value={""}
-                onChange={() => false}
-                label="Stock"
-                placeholder="Stock"
-              />
+              <InputText name="stock" label="Stock" placeholder="Stock" />
             </div>
             <div className="flex gap-3 basis-full">
               <InputText
-                value={""}
-                onChange={() => false}
+                name="discount"
                 label="Discount"
                 placeholder="Discount"
               />
-              <InputText
-                value={""}
-                onChange={() => false}
-                label="SKU"
-                placeholder="SKU"
-              />
+              <InputText name="sku" label="SKU" placeholder="SKU" />
             </div>
           </ContainerBox>
         </div>
@@ -264,17 +184,13 @@ export default function AddProduct() {
                 <SquareX className="text-amber-700" size={13} />
               </div>
             </div>
-            <InputText
-              value={""}
-              onChange={() => false}
-              placeholder="Category name"
-            />
+            <InputText name="category_name" placeholder="Category name" />
             <Button primary onClick={() => console.log("Add category")}>
               Add new Category
             </Button>
           </ContainerBox>
         </div>
       </div>
-    </div>
+    </form>
   );
 }

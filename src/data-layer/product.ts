@@ -3,6 +3,7 @@
 import { auth } from "@/utils/auth";
 import { Product } from "@prisma/client";
 import { redirect } from "next/navigation";
+import prisma from "@/utils/prisma";
 
 export const addProduct = async (
   data: Omit<Product, "id"> & { mediaId?: number },
