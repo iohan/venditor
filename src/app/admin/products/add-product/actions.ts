@@ -70,11 +70,15 @@ export const submitNewProduct = async (product: NewProduct) => {
   });
 
   await addProduct({
-    title: String(product.title),
-    description: String(product.description),
+    title: product.title,
+    description: product.description,
     draft: false,
     shopId: 1,
     mediaId: mediaObjId,
+    sku: product.sku,
+    basePrice: product.basePrice,
+    stock: product.stock,
+    discount: product.discount,
     categoryIds: [...selectedCategoryIds, ...newCategoryIds],
   });
 

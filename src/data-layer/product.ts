@@ -29,6 +29,10 @@ export const addProduct = async (
       description: data.description,
       draft: data.draft,
       shopId: data.shopId,
+      sku: data.sku,
+      discount: data.discount,
+      basePrice: data.basePrice,
+      stock: data.stock,
     },
   });
 

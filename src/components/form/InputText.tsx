@@ -1,19 +1,19 @@
 import { cx } from "@/utils/cx";
 
 const InputText = ({
-  defaultValue,
   name,
   label,
   className,
   placeholder,
+  value,
   onChange,
 }: {
-  defaultValue?: string;
   name: string;
   label?: string;
   className?: string;
   placeholder?: string;
-  onChange?: (val: string) => void;
+  value?: string | number;
+  onChange?: (val: string | null) => void;
 }) => {
   return (
     <div className="flex flex-col gap-1 basis-full">
@@ -22,8 +22,10 @@ const InputText = ({
         placeholder={placeholder}
         name={name}
         type="text"
-        defaultValue={defaultValue}
-        onChange={(e) => onChange && onChange(e.target.value)}
+        onChange={(e) =>
+          onChange && onChange(e.target.value === "" ? null : e.target.value)
+        }
+        value={value ?? ""}
         className={cx(
           "bg-gray-200 rounded-lg text-sm text-gray-800 p-3 outline-none",
           className,

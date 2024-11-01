@@ -2,6 +2,7 @@ import InputText from "@/components/form/InputText";
 import ContainerBox from "../../_components/ContainerBox";
 import TextArea from "@/components/form/TextArea";
 import { NewProduct } from "./AddProductForm";
+import { generateSku } from "@/utils/sku";
 
 const GeneralInfo = ({
   product,
@@ -17,8 +18,14 @@ const GeneralInfo = ({
         label="Product name"
         name="name"
         placeholder="Product name"
-        defaultValue={`${product?.title}`}
-        onChange={(val) => setProduct({ ...product, title: val ?? "" })}
+        value={`${product?.title}`}
+        onChange={(val) =>
+          setProduct({
+            ...product,
+            title: String(val),
+            sku: generateSku(String(val)),
+          })
+        }
       />
       <TextArea
         name="description"

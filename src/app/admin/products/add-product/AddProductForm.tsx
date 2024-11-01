@@ -13,6 +13,8 @@ import productMan from "@/images/product-man-beenie.webp";
 import productBeenie1 from "@/images/product-beenie.webp";
 import productBeenie2 from "@/images/product-beenie2.webp";
 import SelectCategory from "./SelectCategory";
+import { generateSku } from "@/utils/sku";
+import { numberOnly } from "@/utils/number-only";
 
 export type SelectedCategory = { id?: number; title: string };
 export type NewProduct = Omit<Product, "id"> & {
@@ -24,8 +26,12 @@ const AddProductForm = ({ categories }: { categories: Category[] }) => {
   const [fileUrl, setFileUrl] = useState<string | undefined>(undefined);
   const [product, setProduct] = useState<NewProduct>({
     title: "",
-    description: "",
     draft: true,
+    description: null,
+    stock: null,
+    basePrice: null,
+    discount: null,
+    sku: "",
     shopId: 1,
     selectedCategories: [],
     media: undefined,
@@ -94,17 +100,41 @@ const AddProductForm = ({ categories }: { categories: Category[] }) => {
               <InputText
                 name="base_price"
                 label="Base pricing"
+                onChange={(val) =>
+                  setProduct({ ...product, basePrice: numberOnly(val) })
+                }
+                value={product.basePrice ?? undefined}
                 placeholder="Base pricing"
               />
-              <InputText name="stock" label="Stock" placeholder="Stock" />
+              <InputText
+                name="stock"
+                label="Stock"
+                placeholder="Stock"
+                onChange={(val) =>
+                  setProduct({ ...product, stock: numberOnly(val) })
+                }
+                value={product.stock ?? undefined}
+              />
             </div>
             <div className="flex gap-3 basis-full">
               <InputText
                 name="discount"
                 label="Discount"
+                onChange={(val) =>
+                  setProduct({ ...product, discount: numberOnly(val) })
+                }
+                value={product.discount ?? undefined}
                 placeholder="Discount"
               />
-              <InputText name="sku" label="SKU" placeholder="SKU" />
+              <InputText
+                name="sku"
+                onChange={(val) =>
+                  setProduct({ ...product, sku: generateSku(String(val)) })
+                }
+                label="SKU"
+                value={product.sku}
+                placeholder="SKU"
+              />
             </div>
           </ContainerBox>
         </div>

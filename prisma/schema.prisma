@@ -95,6 +95,10 @@ model Product {
   shopId          Int
   ProductMedia    ProductMedia[]
   ProductCategory ProductCategory[]
+  basePrice       Int?
+  stock           Int?
+  sku             String
+  discount        Int?
 }
 
 model ProductMedia {
