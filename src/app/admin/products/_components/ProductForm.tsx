@@ -1,7 +1,7 @@
 "use client";
 
 import { Category } from "@prisma/client";
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import { BookDashed, Check, LayoutList } from "lucide-react";
 import Button from "@/components/button/Button";
 import GeneralInfo from "./GeneralInfo";
@@ -64,6 +64,10 @@ const ProductForm = ({
       }
     }
   };
+
+  useEffect(() => {
+    console.log(productData);
+  }, [productData]);
 
   return (
     <form onSubmit={handleOnSubmit}>

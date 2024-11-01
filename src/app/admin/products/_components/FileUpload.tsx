@@ -1,9 +1,7 @@
-import { ChangeEvent, useEffect, useState } from "react";
+import { ChangeEvent, useState } from "react";
 import ContainerBox from "../../_components/ContainerBox";
 import FileInput from "./FileInput";
 import { ProductType } from "@/data-layer/product";
-
-// TODO: Use product.mediaFiles when showing and removing media files
 
 const FileUpload = ({
   product,
@@ -16,25 +14,18 @@ const FileUpload = ({
   uploadedMediaFiles: File[];
   setUploadedMediaFiles: (files: File[]) => void;
 }) => {
-  const [filesUploaded, setFilesUploaded] = useState<
-    { file: File; tempUrl: string }[]
-  >([]);
+  const [mediaFiles, setMediaFiles] = useState<
+    { file?: File; id?: number; url: string }[]
+  >([...(product.mediaFiles || [])]);
 
-  const handleImageOnChange = (
-    e: ChangeEvent<HTMLInputElement>,
-    index: number,
-  ) => {
+  const handleImageOnChange = (e: ChangeEvent<HTMLInputElement>) => {
     const uploadedMediaFile = e.target.files?.[0];
     if (uploadedMediaFile) {
-      setFilesUploaded((prevFilesUploaded) => {
-        if (prevFilesUploaded[index]) {
-          URL.revokeObjectURL(prevFilesUploaded[index].tempUrl);
-        }
-
-        const updatedFiles = [...prevFilesUploaded];
+      setMediaFiles((prevFiles) => {
+        const updatedFiles = [...prevFiles];
         updatedFiles.push({
           file: uploadedMediaFile,
-          tempUrl: URL.createObjectURL(uploadedMediaFile),
+          url: URL.createObjectURL(uploadedMediaFile),
         });
         return updatedFiles;
       });
@@ -44,30 +35,44 @@ const FileUpload = ({
   };
 
   const removeImage = (index: number) => {
-    setFilesUploaded((prevFilesUploaded) => {
-      if (prevFilesUploaded[index]) {
-        URL.revokeObjectURL(prevFilesUploaded[index].tempUrl);
-      }
-      const updatedFiles = [...prevFilesUploaded];
+    if (mediaFiles[index].file) {
+      setMediaFiles((prevFiles) => {
+        if (prevFiles[index] && !prevFiles[index].file) {
+          URL.revokeObjectURL(prevFiles[index].url);
+        }
+
+        const updatedFiles = [...prevFiles];
+        updatedFiles.splice(index, 1);
+        return updatedFiles;
+      });
+
+      const updatedFiles = [...uploadedMediaFiles];
       updatedFiles.splice(index, 1);
-      return updatedFiles;
-    });
 
-    const updatedFiles = [...uploadedMediaFiles];
-    updatedFiles.splice(index, 1);
+      setUploadedMediaFiles(updatedFiles);
+    } else {
+      setMediaFiles((prevFiles) => {
+        const updatedFiles = [...prevFiles];
+        updatedFiles.splice(index, 1);
+        return updatedFiles;
+      });
 
-    setUploadedMediaFiles(updatedFiles);
+      const id = mediaFiles[index].id;
+      const updatedMediaFiles = [...(product.mediaFiles || [])];
+      setProduct({
+        ...product,
+        mediaFiles: updatedMediaFiles.filter((m) => m.id !== id),
+      });
+    }
   };
-
-  useEffect(() => {}, [filesUploaded]);
 
   return (
     <ContainerBox>
       <div className="font-semibold text-lg">Upload Img</div>
-      {filesUploaded.length > 0 && (
+      {mediaFiles.length > 0 && (
         <FileInput
           index={0}
-          image={filesUploaded[0]?.tempUrl}
+          image={mediaFiles[0]?.url}
           handleImageOnChange={handleImageOnChange}
           handleRemoveImage={removeImage}
           big
@@ -75,17 +80,15 @@ const FileUpload = ({
       )}
 
       <div className="flex gap-2 flex-wrap">
-        {[...Array(filesUploaded.length > 4 ? filesUploaded.length : 4)].map(
+        {[...Array(mediaFiles.length > 4 ? mediaFiles.length : 4)].map(
           (_, i) => {
-            const index = filesUploaded.length > 0 ? i + 1 : i;
+            const index = mediaFiles.length > 0 ? i + 1 : i;
             return (
               <FileInput
                 index={index}
                 key={index}
                 image={
-                  filesUploaded[index]?.tempUrl
-                    ? filesUploaded[index].tempUrl
-                    : undefined
+                  mediaFiles[index]?.url ? mediaFiles[index].url : undefined
                 }
                 handleImageOnChange={handleImageOnChange}
                 handleRemoveImage={removeImage}

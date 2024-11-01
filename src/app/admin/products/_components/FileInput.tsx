@@ -19,7 +19,6 @@ const FileInput = ({
   handleRemoveImage: (index: number) => void;
 }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
-
   const handleClick = () => {
     if (image) {
       handleRemoveImage(index);
