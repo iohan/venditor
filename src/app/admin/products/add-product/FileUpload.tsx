@@ -4,7 +4,7 @@ import FileInput from "./FileInput";
 
 const FileUpload = () => {
   const [filesUploaded, setFilesUploaded] = useState<
-    ({ file: File; tempUrl: string } | undefined)[]
+    { file: File; tempUrl: string }[]
   >([]);
 
   const handleImageOnChange = (
@@ -20,10 +20,10 @@ const FileUpload = () => {
         }
 
         const updatedFiles = [...prevFilesUploaded];
-        updatedFiles[index] = {
+        updatedFiles.push({
           file: uploadedMediaFile,
           tempUrl: URL.createObjectURL(uploadedMediaFile),
-        };
+        });
         return updatedFiles;
       });
     }
@@ -35,7 +35,7 @@ const FileUpload = () => {
         URL.revokeObjectURL(prevFilesUploaded[index].tempUrl);
       }
       const updatedFiles = [...prevFilesUploaded];
-      updatedFiles[index] = undefined;
+      updatedFiles.splice(index, 1);
       return updatedFiles;
     });
   };
