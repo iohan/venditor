@@ -5,6 +5,11 @@ import { Product } from "@prisma/client";
 import { redirect } from "next/navigation";
 import prisma from "@/utils/prisma";
 
+export const getProducts = async ({ shopId }: { shopId: number }) => {
+  const response = await prisma.product.findMany({ where: { shopId } });
+  return response;
+};
+
 export const addProduct = async (
   data: Omit<Product, "id"> & { mediaId?: number } & { categoryIds: number[] },
 ) => {

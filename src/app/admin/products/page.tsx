@@ -1,5 +1,7 @@
 import { auth } from "@/utils/auth";
 import { redirect } from "next/navigation";
+import ProductTable from "./ProductTable";
+import { getProducts } from "@/data-layer/product";
 
 export default async function Products() {
   const session = await auth();
@@ -8,5 +10,7 @@ export default async function Products() {
     redirect("/api/auth/signin");
   }
 
-  return <>Products</>;
+  const products = await getProducts({ shopId: 1 });
+
+  return <ProductTable products={products} />;
 }

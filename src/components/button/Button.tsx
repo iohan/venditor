@@ -1,5 +1,6 @@
 import { cx } from "@/utils/cx";
 import { LucideProps } from "lucide-react";
+import Link from "next/link";
 import { ForwardRefExoticComponent, ReactNode, RefAttributes } from "react";
 
 const Button = ({
@@ -9,6 +10,7 @@ const Button = ({
   secondary,
   children,
   onClick,
+  href,
   type,
 }: {
   children: ReactNode;
@@ -16,6 +18,7 @@ const Button = ({
   className?: string;
   primary?: boolean;
   secondary?: boolean;
+  href?: string;
   type?: "submit";
   icon?: ForwardRefExoticComponent<
     Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>
@@ -37,6 +40,14 @@ const Button = ({
         {Icon}
         {children}
       </button>
+    );
+  }
+  if (href) {
+    return (
+      <Link href={href} className={style}>
+        {Icon}
+        {children}
+      </Link>
     );
   }
   return (
