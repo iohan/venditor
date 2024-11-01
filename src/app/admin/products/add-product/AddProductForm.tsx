@@ -15,6 +15,7 @@ import productBeenie2 from "@/images/product-beenie2.webp";
 import SelectCategory from "./SelectCategory";
 import { generateSku } from "@/utils/sku";
 import { numberOnly } from "@/utils/number-only";
+import FileUpload from "./FileUpload";
 
 export type SelectedCategory = { id?: number; title: string };
 export type NewProduct = Omit<Product, "id"> & {
@@ -22,8 +23,8 @@ export type NewProduct = Omit<Product, "id"> & {
 } & { media?: File };
 
 const AddProductForm = ({ categories }: { categories: Category[] }) => {
-  const [file, setFile] = useState<File | undefined>(undefined);
-  const [fileUrl, setFileUrl] = useState<string | undefined>(undefined);
+  const [media, setMedia] = useState<File | undefined>(undefined);
+  const [mediaUrl, setMediaUrl] = useState<string | undefined>(undefined);
   const [product, setProduct] = useState<NewProduct>({
     title: "",
     draft: true,
@@ -36,21 +37,6 @@ const AddProductForm = ({ categories }: { categories: Category[] }) => {
     selectedCategories: [],
     media: undefined,
   });
-
-  const handleImageOnChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const uploadedFile = e.target.files?.[0];
-    setFile(uploadedFile);
-
-    if (fileUrl) {
-      URL.revokeObjectURL(fileUrl);
-    }
-
-    if (uploadedFile) {
-      setFileUrl(URL.createObjectURL(uploadedFile));
-    } else {
-      setFileUrl(undefined);
-    }
-  };
 
   const handleOnSubmit = async (evt: FormEvent<HTMLFormElement>) => {
     evt.preventDefault();
@@ -139,50 +125,7 @@ const AddProductForm = ({ categories }: { categories: Category[] }) => {
           </ContainerBox>
         </div>
         <div className="basis-1/3 flex flex-col gap-5">
-          <ContainerBox>
-            <div className="font-semibold text-lg">Upload Img</div>
-            <input
-              type="file"
-              name="media"
-              accept="image/jpeg,image/png, image/webp, image/gif, video/mp4, video/webm"
-              onChange={handleImageOnChange}
-            />
-            {fileUrl && file && (
-              <div className="flex-grow relative h-[300px] rounded-lg overflow-hidden">
-                <img
-                  src={fileUrl}
-                  alt="Picture of the author"
-                  className="absolute inset-0 object-cover w-full h-full"
-                />
-              </div>
-            )}
-            <div className="flex gap-2">
-              <div className="flex-grow relative basis-1/4 aspect-square rounded-lg overflow-hidden">
-                <Image
-                  src={productMan}
-                  alt="Picture of the author"
-                  className="absolute inset-0 object-cover w-full h-full"
-                />
-              </div>
-              <div className="flex-grow relative basis-1/4 aspect-square rounded-lg overflow-hidden">
-                <Image
-                  src={productBeenie1}
-                  alt="Picture of the author"
-                  className="absolute inset-0 object-cover w-full h-full"
-                />
-              </div>
-              <div className="flex-grow relative basis-1/4 aspect-square rounded-lg overflow-hidden">
-                <Image
-                  src={productBeenie2}
-                  alt="Picture of the author"
-                  className="absolute inset-0 object-cover w-full h-full"
-                />
-              </div>
-              <div className="border cursor-pointer hover:border-red-200 flex justify-center items-center border-2 border-dashed basis-1/4 aspect-square rounded-lg overflow-hidden">
-                <CirclePlus className="text-amber-700" />
-              </div>
-            </div>
-          </ContainerBox>
+          <FileUpload />
           <SelectCategory
             categories={categories}
             product={product}
