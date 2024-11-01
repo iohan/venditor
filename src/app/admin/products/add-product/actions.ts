@@ -8,7 +8,10 @@ import { redirect } from "next/navigation";
 import { NewProduct } from "./AddProductForm";
 import { addCategories } from "@/data-layer/category";
 
-export const submitNewProduct = async (product: NewProduct) => {
+export const submitNewProduct = async (
+  product: NewProduct,
+  mediaFormData: FormData,
+) => {
   const session = await auth();
 
   if (!session) {
@@ -19,36 +22,46 @@ export const submitNewProduct = async (product: NewProduct) => {
     throw new Error("shopId is required");
   }
 
-  let mediaObjId: number | undefined = undefined;
+  const mediaFiles = mediaFormData.getAll("mediaFiles");
+  const mediaObjIds: number[] = [];
 
-  if (product.media && product.media instanceof File) {
-    try {
-      const checksum = await computeFileChecksum(product.media);
+  if (mediaFiles) {
+    await Promise.all(
+      mediaFiles.map(async (mediaFile) => {
+        if (mediaFile && mediaFile instanceof File) {
+          try {
+            const checksum = await computeFileChecksum(mediaFile);
 
-      const signedUrlResult = await getSignedURL(
-        product.media.type,
-        product.media.size,
-        checksum,
-      );
+            const signedUrlResult = await getSignedURL(
+              mediaFile.type,
+              mediaFile.size,
+              checksum,
+            );
 
-      if (signedUrlResult.failure !== undefined) {
-        throw new Error(signedUrlResult.failure);
-      }
+            if (signedUrlResult.failure !== undefined) {
+              throw new Error(signedUrlResult.failure);
+            }
 
-      const { url, mediaId } = signedUrlResult.success;
-      mediaObjId = mediaId;
+            const { url, mediaId } = signedUrlResult.success;
+            console.log(mediaId);
+            mediaObjIds.push(mediaId);
 
-      await fetch(url, {
-        method: "PUT",
-        body: product.media,
-        headers: {
-          "Content-Type": product.media.type,
-        },
-      });
-    } catch (e) {
-      console.error(e);
-    }
+            await fetch(url, {
+              method: "PUT",
+              body: mediaFile,
+              headers: {
+                "Content-Type": mediaFile.type,
+              },
+            });
+          } catch (e) {
+            console.error(e);
+          }
+        }
+      }),
+    );
   }
+
+  console.log(mediaObjIds);
 
   const newCategories = product.selectedCategories.filter((c) => !c.id);
   let newCategoryIds: number[] = [];
@@ -69,12 +82,14 @@ export const submitNewProduct = async (product: NewProduct) => {
     }
   });
 
+  console.log("MEDIA", mediaObjIds);
+
   await addProduct({
     title: product.title,
     description: product.description,
     draft: false,
     shopId: 1,
-    mediaId: mediaObjId,
+    mediaIds: mediaObjIds,
     sku: product.sku,
     basePrice: product.basePrice,
     stock: product.stock,

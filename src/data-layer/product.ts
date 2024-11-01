@@ -11,7 +11,9 @@ export const getProducts = async ({ shopId }: { shopId: number }) => {
 };
 
 export const addProduct = async (
-  data: Omit<Product, "id"> & { mediaId?: number } & { categoryIds: number[] },
+  data: Omit<Product, "id"> & { mediaIds: number[] } & {
+    categoryIds: number[];
+  },
 ) => {
   const session = await auth();
 
@@ -38,12 +40,12 @@ export const addProduct = async (
 
   const productId = newProduct.id;
 
-  if (data.mediaId !== undefined && productId) {
-    await prisma.productMedia.create({
-      data: {
+  if (data.mediaIds.length > 0 && productId) {
+    await prisma.productMedia.createMany({
+      data: data.mediaIds.map((id) => ({
         productId,
-        mediaId: data.mediaId,
-      },
+        mediaId: id,
+      })),
     });
   }
 

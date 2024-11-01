@@ -2,7 +2,13 @@ import { ChangeEvent, useEffect, useState } from "react";
 import ContainerBox from "../../_components/ContainerBox";
 import FileInput from "./FileInput";
 
-const FileUpload = () => {
+const FileUpload = ({
+  mediaFiles,
+  setMediaFiles,
+}: {
+  mediaFiles: File[];
+  setMediaFiles: (files: File[]) => void;
+}) => {
   const [filesUploaded, setFilesUploaded] = useState<
     { file: File; tempUrl: string }[]
   >([]);
@@ -11,7 +17,6 @@ const FileUpload = () => {
     e: ChangeEvent<HTMLInputElement>,
     index: number,
   ) => {
-    console.log("File", e, index);
     const uploadedMediaFile = e.target.files?.[0];
     if (uploadedMediaFile) {
       setFilesUploaded((prevFilesUploaded) => {
@@ -26,6 +31,8 @@ const FileUpload = () => {
         });
         return updatedFiles;
       });
+
+      setMediaFiles([...mediaFiles, uploadedMediaFile]);
     }
   };
 
@@ -38,11 +45,14 @@ const FileUpload = () => {
       updatedFiles.splice(index, 1);
       return updatedFiles;
     });
+
+    const updatedFiles = [...mediaFiles];
+    updatedFiles.splice(index, 1);
+
+    setMediaFiles(updatedFiles);
   };
 
-  useEffect(() => {
-    console.log(filesUploaded);
-  }, [filesUploaded]);
+  useEffect(() => {}, [filesUploaded]);
 
   return (
     <ContainerBox>

@@ -14,10 +14,10 @@ import { numberOnly } from "@/utils/number-only";
 import FileUpload from "./FileUpload";
 
 export type SelectedCategory = { id?: number; title: string };
+
 export type NewProduct = Omit<Product, "id"> & {
   selectedCategories: SelectedCategory[];
-} & { mediaFiles?: File[] };
-
+};
 const AddProductForm = ({ categories }: { categories: Category[] }) => {
   const [product, setProduct] = useState<NewProduct>({
     title: "",
@@ -29,14 +29,21 @@ const AddProductForm = ({ categories }: { categories: Category[] }) => {
     sku: "",
     shopId: 1,
     selectedCategories: [],
-    mediaFiles: undefined,
   });
+
+  const [mediaFiles, setMediaFiles] = useState<File[]>([]);
 
   const handleOnSubmit = async (evt: FormEvent<HTMLFormElement>) => {
     evt.preventDefault();
 
+    const mediaFormData = new FormData();
+
+    mediaFiles.forEach((mediaFile) => {
+      mediaFormData.append("mediaFiles", mediaFile, mediaFile.name);
+    });
+
     try {
-      const response = await submitNewProduct(product);
+      const response = await submitNewProduct(product, mediaFormData);
       console.log(response);
     } catch (error) {
       console.error(error);
@@ -50,6 +57,10 @@ const AddProductForm = ({ categories }: { categories: Category[] }) => {
   useEffect(() => {
     console.log(product);
   }, [product]);
+
+  useEffect(() => {
+    console.log(mediaFiles);
+  }, [mediaFiles]);
 
   return (
     <form onSubmit={handleOnSubmit}>
@@ -119,7 +130,7 @@ const AddProductForm = ({ categories }: { categories: Category[] }) => {
           </ContainerBox>
         </div>
         <div className="basis-1/3 flex flex-col gap-5">
-          <FileUpload product={product} setProduct={setProduct} />
+          <FileUpload mediaFiles={mediaFiles} setMediaFiles={setMediaFiles} />
           <SelectCategory
             categories={categories}
             product={product}
