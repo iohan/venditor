@@ -5,28 +5,29 @@ import { addProduct } from "@/data-layer/product";
 import { auth } from "@/utils/auth";
 import { computeFileChecksum } from "@/utils/compute-file-checksum";
 import { redirect } from "next/navigation";
+import { NewProduct } from "./AddProductForm";
+import { addCategories } from "@/data-layer/category";
 
-export const submitNewProduct = async (formData: FormData) => {
+export const submitNewProduct = async (product: NewProduct) => {
   const session = await auth();
 
   if (!session) {
     redirect("/api/auth/signin");
   }
 
-  const name = formData.get("name") ?? "";
-  const description = formData.get("description") ?? "";
-  const sku = formData.get("sku") ?? "";
-  const media = formData.get("media");
+  if (!product.shopId) {
+    throw new Error("shopId is required");
+  }
 
   let mediaObjId: number | undefined = undefined;
 
-  if (media && media instanceof File) {
+  if (product.media && product.media instanceof File) {
     try {
-      const checksum = await computeFileChecksum(media);
+      const checksum = await computeFileChecksum(product.media);
 
       const signedUrlResult = await getSignedURL(
-        media.type,
-        media.size,
+        product.media.type,
+        product.media.size,
         checksum,
       );
 
@@ -39,9 +40,9 @@ export const submitNewProduct = async (formData: FormData) => {
 
       await fetch(url, {
         method: "PUT",
-        body: media,
+        body: product.media,
         headers: {
-          "Content-Type": media.type,
+          "Content-Type": product.media.type,
         },
       });
     } catch (e) {
@@ -49,13 +50,32 @@ export const submitNewProduct = async (formData: FormData) => {
     }
   }
 
+  const newCategories = product.selectedCategories.filter((c) => !c.id);
+  let newCategoryIds: number[] = [];
+  const selectedCategoryIds: number[] = [];
+
+  if (newCategories.length > 0) {
+    const newCategoriesResponse = await addCategories(
+      newCategories.map((c) => c.title),
+      product.shopId,
+    );
+
+    newCategoryIds = newCategoriesResponse.map((c) => c.id);
+  }
+
+  product.selectedCategories.forEach((c) => {
+    if (c.id !== undefined) {
+      selectedCategoryIds.push(c.id);
+    }
+  });
+
   await addProduct({
-    title: String(name),
-    description: String(description),
+    title: String(product.title),
+    description: String(product.description),
     draft: false,
-    categoryId: 1,
     shopId: 1,
     mediaId: mediaObjId,
+    categoryIds: [...selectedCategoryIds, ...newCategoryIds],
   });
 
   return { status: "success", message: "New product successfully added" };

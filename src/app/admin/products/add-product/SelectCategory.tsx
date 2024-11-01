@@ -1,64 +1,50 @@
 import Dropdown, { DropdownOption } from "@/components/form/Dropdown";
 import ContainerBox from "../../_components/ContainerBox";
 import { SquareX } from "lucide-react";
-import InputText from "@/components/form/InputText";
-import Button from "@/components/button/Button";
-import { useEffect, useState } from "react";
-import { getCategories } from "@/data-layer/category";
-import { ProductCategory } from "@prisma/client";
+import NewCategory from "./NewCategory";
+import { Category as CategoryType } from "@prisma/client";
+import { NewProduct } from "./AddProductForm";
 
-const Category = ({
-  selectedCategories,
-  setSelectedCategories,
-}: {
-  selectedCategories: { id?: number; title: string }[];
-  setSelectedCategories: (categories: { id?: number; title: string }[]) => void;
-}) => {
-  const [categories, setCategories] =
-    useState<Omit<ProductCategory, "shopId">[]>();
-  const [newCategory, setNewCategory] = useState<string>("");
+interface CategoryProps {
+  categories: CategoryType[];
+  product: NewProduct;
+  setProduct: (product: NewProduct) => void;
+}
 
-  useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const res = await getCategories(1);
-        if (res.length === 0) {
-          throw new Error("Failed to fetch product data");
-        }
-        setCategories(res);
-      } catch (err) {
-        console.error(err);
-      }
-    };
-
-    fetchCategories();
-  }, []);
+const Category = ({ categories, product, setProduct }: CategoryProps) => {
+  const selectedCategories = product.selectedCategories;
 
   const onSelectCategory = (category: DropdownOption) => {
     const id = Number(category.value);
     const title = category.label;
 
     if (!selectedCategories.some((c) => c.id === id)) {
-      setSelectedCategories([...selectedCategories, { id, title }]);
+      setProduct({
+        ...product,
+        selectedCategories: [...product.selectedCategories, { id, title }],
+      });
     }
   };
 
   const onUnselectCategory = (id: number | undefined, title: string) => {
-    setSelectedCategories(
-      selectedCategories.filter(
+    setProduct({
+      ...product,
+      selectedCategories: selectedCategories.filter(
         (selected) => selected.id !== id || selected.title !== title,
       ),
-    );
+    });
   };
 
-  const onAddNewCategory = () => {
+  const onAddNewCategory = (newCategory: string) => {
     if (newCategory.length > 2) {
-      setSelectedCategories([
-        ...selectedCategories,
-        { id: undefined, title: newCategory },
-      ]);
+      setProduct({
+        ...product,
+        selectedCategories: [
+          ...product.selectedCategories,
+          { id: undefined, title: newCategory },
+        ],
+      });
     }
-    setNewCategory("");
   };
 
   return (
@@ -66,7 +52,7 @@ const Category = ({
       <div className="font-semibold text-lg">Category</div>
       <Dropdown
         options={categories
-          ?.filter((c) => !selectedCategories.some((s) => s.id === c.id))
+          .filter((c) => !selectedCategories.some((s) => s.id === c.id))
           .map((category) => ({
             label: category.title,
             value: String(category.id),
@@ -74,8 +60,11 @@ const Category = ({
         onChange={onSelectCategory}
       />
       <div className="flex text-sm gap-2 flex-wrap">
-        {selectedCategories.map((s) => (
-          <div key={s.id} className="flex-shrink-0 flex-grow-0 basis-auto">
+        {selectedCategories.map((s, i) => (
+          <div
+            key={s.id ? s.id : `unsaved_${i}`}
+            className="flex-shrink-0 flex-grow-0 basis-auto"
+          >
             <div
               className="flex items-center gap-x-1 hover:underline cursor-pointer"
               onClick={() => onUnselectCategory(s.id, s.title)}
@@ -86,15 +75,7 @@ const Category = ({
           </div>
         ))}
       </div>
-      <InputText
-        name="category_name"
-        onChange={(val) => setNewCategory(val)}
-        defaultValue={newCategory}
-        placeholder="Category name"
-      />
-      <Button primary onClick={onAddNewCategory}>
-        Add new Category
-      </Button>
+      <NewCategory onAdd={(category: string) => onAddNewCategory(category)} />
     </ContainerBox>
   );
 };

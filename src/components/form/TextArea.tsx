@@ -6,12 +6,14 @@ const TextArea = ({
   className,
   placeholder,
   defaultValue,
+  onChange,
 }: {
   name: string;
   label?: string;
   className?: string;
   placeholder?: string;
   defaultValue?: string;
+  onChange?: (val: string) => void;
 }) => {
   return (
     <div className="flex flex-col gap-1 basis-full">
@@ -24,6 +26,7 @@ const TextArea = ({
         name={name}
         placeholder={placeholder}
         defaultValue={defaultValue}
+        onChange={(e) => onChange && onChange(e.target.value)}
       ></textarea>
     </div>
   );

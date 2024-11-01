@@ -1,11 +1,11 @@
-
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
   previewFeatures = ["driverAdapters"]
 }
 
@@ -62,31 +62,39 @@ model VerificationToken {
 }
 
 model Shop {
+  id       Int        @id @default(autoincrement())
+  title    String
+  Category Category[]
+  Product  Product[]
+  Media    Media[]
+}
+
+model Category {
   id              Int               @id @default(autoincrement())
   title           String
+  shop            Shop              @relation(fields: [shopId], references: [id])
+  shopId          Int
   ProductCategory ProductCategory[]
-  Product         Product[]
-  Media           Media[]
 }
 
 model ProductCategory {
-  id       Int       @id @default(autoincrement())
-  title    String
-  products Product[]
-  shop     Shop      @relation(fields: [shopId], references: [id])
-  shopId   Int
+  product    Product  @relation(fields: [productId], references: [id])
+  productId  Int
+  category   Category @relation(fields: [categoryId], references: [id])
+  categoryId Int
+
+  @@id([productId, categoryId])
 }
 
 model Product {
-  id           Int             @id @default(autoincrement())
-  title        String
-  description  String?
-  draft        Boolean         @default(true)
-  category     ProductCategory @relation(fields: [categoryId], references: [id])
-  categoryId   Int
-  shop         Shop            @relation(fields: [shopId], references: [id])
-  shopId       Int
-  ProductMedia ProductMedia[]
+  id              Int               @id @default(autoincrement())
+  title           String
+  description     String?
+  draft           Boolean           @default(true)
+  shop            Shop              @relation(fields: [shopId], references: [id])
+  shopId          Int
+  ProductMedia    ProductMedia[]
+  ProductCategory ProductCategory[]
 }
 
 model ProductMedia {
@@ -106,4 +114,3 @@ model Media {
   shopId       Int
   ProductMedia ProductMedia[]
 }
-
