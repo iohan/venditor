@@ -1,17 +1,13 @@
 "use client";
 
 import { Category, Product } from "@prisma/client";
-import { ChangeEvent, FormEvent, useEffect, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import { submitNewProduct } from "./actions";
-import { BookDashed, Check, CirclePlus, LayoutList } from "lucide-react";
+import { BookDashed, Check, LayoutList } from "lucide-react";
 import Button from "@/components/button/Button";
 import GeneralInfo from "./GeneralInfo";
 import ContainerBox from "../../_components/ContainerBox";
 import InputText from "@/components/form/InputText";
-import Image from "next/image";
-import productMan from "@/images/product-man-beenie.webp";
-import productBeenie1 from "@/images/product-beenie.webp";
-import productBeenie2 from "@/images/product-beenie2.webp";
 import SelectCategory from "./SelectCategory";
 import { generateSku } from "@/utils/sku";
 import { numberOnly } from "@/utils/number-only";
@@ -20,11 +16,9 @@ import FileUpload from "./FileUpload";
 export type SelectedCategory = { id?: number; title: string };
 export type NewProduct = Omit<Product, "id"> & {
   selectedCategories: SelectedCategory[];
-} & { media?: File };
+} & { mediaFiles?: File[] };
 
 const AddProductForm = ({ categories }: { categories: Category[] }) => {
-  const [media, setMedia] = useState<File | undefined>(undefined);
-  const [mediaUrl, setMediaUrl] = useState<string | undefined>(undefined);
   const [product, setProduct] = useState<NewProduct>({
     title: "",
     draft: true,
@@ -35,7 +29,7 @@ const AddProductForm = ({ categories }: { categories: Category[] }) => {
     sku: "",
     shopId: 1,
     selectedCategories: [],
-    media: undefined,
+    mediaFiles: undefined,
   });
 
   const handleOnSubmit = async (evt: FormEvent<HTMLFormElement>) => {
@@ -125,7 +119,7 @@ const AddProductForm = ({ categories }: { categories: Category[] }) => {
           </ContainerBox>
         </div>
         <div className="basis-1/3 flex flex-col gap-5">
-          <FileUpload />
+          <FileUpload product={product} setProduct={setProduct} />
           <SelectCategory
             categories={categories}
             product={product}

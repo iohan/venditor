@@ -1,26 +1,13 @@
 import { ChangeEvent, useEffect, useState } from "react";
 import ContainerBox from "../../_components/ContainerBox";
-import { cx } from "@/utils/cx";
-import { CirclePlus } from "lucide-react";
 import FileInput from "./FileInput";
 
 const FileUpload = () => {
   const [filesUploaded, setFilesUploaded] = useState<
-    { file: File; tempUrl: string }[]
+    ({ file: File; tempUrl: string } | undefined)[]
   >([]);
 
-  /*const handleImageOnChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const uploadedMedia = e.target.files?.[0];
-
-    if (uploadedMedia) {
-      setFilesUploaded((prevFilesUploaded) => [
-        ...prevFilesUploaded,
-        { ...uploadedMedia, tempUrl: URL.createObjectURL(uploadedMedia) },
-      ]);
-    }
-  };*/
-
-  const handleImageChange = (
+  const handleImageOnChange = (
     e: ChangeEvent<HTMLInputElement>,
     index: number,
   ) => {
@@ -29,7 +16,7 @@ const FileUpload = () => {
     if (uploadedMediaFile) {
       setFilesUploaded((prevFilesUploaded) => {
         if (prevFilesUploaded[index]) {
-          URL.revokeObjectURL(filesUploaded[index].tempUrl);
+          URL.revokeObjectURL(prevFilesUploaded[index].tempUrl);
         }
 
         const updatedFiles = [...prevFilesUploaded];
@@ -42,8 +29,15 @@ const FileUpload = () => {
     }
   };
 
-  const removeImage = () => {
-    console.log("REMOVE");
+  const removeImage = (index: number) => {
+    setFilesUploaded((prevFilesUploaded) => {
+      if (prevFilesUploaded[index]) {
+        URL.revokeObjectURL(prevFilesUploaded[index].tempUrl);
+      }
+      const updatedFiles = [...prevFilesUploaded];
+      updatedFiles[index] = undefined;
+      return updatedFiles;
+    });
   };
 
   useEffect(() => {
@@ -54,13 +48,13 @@ const FileUpload = () => {
     <ContainerBox>
       <div className="font-semibold text-lg">Upload Img</div>
       {filesUploaded.length > 0 && (
-        <div className="flex-grow relative h-[300px] rounded-lg overflow-hidden">
-          <img
-            src={filesUploaded[0].tempUrl}
-            alt="Picture of the author"
-            className="absolute inset-0 object-cover w-full h-full"
-          />
-        </div>
+        <FileInput
+          index={0}
+          image={filesUploaded[0]?.tempUrl}
+          handleImageOnChange={handleImageOnChange}
+          handleRemoveImage={removeImage}
+          big
+        />
       )}
 
       <div className="flex gap-2 flex-wrap">
@@ -76,7 +70,8 @@ const FileUpload = () => {
                     ? filesUploaded[index].tempUrl
                     : undefined
                 }
-                handleImageChange={handleImageChange}
+                handleImageOnChange={handleImageOnChange}
+                handleRemoveImage={removeImage}
               />
             );
           },

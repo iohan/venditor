@@ -4,38 +4,46 @@ import { ChangeEvent, useRef } from "react";
 
 const FileInput = ({
   index,
-  handleImageChange,
+  handleImageOnChange,
+  handleRemoveImage,
+  big,
   image,
 }: {
   index: number;
   image: string | undefined;
-  handleImageChange: (
+  big?: true;
+  handleImageOnChange: (
     event: ChangeEvent<HTMLInputElement>,
     index: number,
   ) => void;
+  handleRemoveImage: (index: number) => void;
 }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleClick = () => {
-    console.log("Open", index);
+    if (image) {
+      handleRemoveImage(index);
+      return;
+    }
     fileInputRef.current?.click();
   };
-
-  console.log(image);
 
   return (
     <>
       <input
         type="file"
         ref={fileInputRef}
-        onChange={(event) => handleImageChange(event, index)}
+        onChange={(event) => handleImageOnChange(event, index)}
         multiple
         style={{ display: "none" }}
       />
       <div
-        key={index}
         className={cx(
-          "group border cursor-pointer hover:border-red-200 flex justify-center items-center border-2 border-dashed w-[calc(25%-6px)] aspect-square rounded-lg overflow-hidden",
+          "cursor-pointer",
+          !big &&
+            "group hover:border-red-200 flex justify-center items-center w-[calc(25%-6px)] aspect-square rounded-lg overflow-hidden",
+          big && "flex-grow relative h-[300px] rounded-lg overflow-hidden",
+          !image && "border-2 border-dashed hover:border-red-200",
           image && "relative",
         )}
         onClick={handleClick}
@@ -43,7 +51,6 @@ const FileInput = ({
         {image ? (
           <img
             src={image}
-            alt="Picture of the author"
             className="absolute inset-0 object-cover w-full h-full"
           />
         ) : (
