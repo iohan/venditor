@@ -35,7 +35,7 @@ const Table = <T extends { id: number }>({
                   <td
                     key={i}
                     className={`p-2 ${fields[field].center && "text-center"} cursor-pointer`}
-                    onClick={onClick}
+                    onClick={() => onClick(item)}
                   >
                     {Presentation ? (
                       <Presentation data={item} />

@@ -1,13 +1,20 @@
 import { ChangeEvent, useEffect, useState } from "react";
 import ContainerBox from "../../_components/ContainerBox";
 import FileInput from "./FileInput";
+import { ProductType } from "@/data-layer/product";
+
+// TODO: Use product.mediaFiles when showing and removing media files
 
 const FileUpload = ({
-  mediaFiles,
-  setMediaFiles,
+  product,
+  setProduct,
+  uploadedMediaFiles,
+  setUploadedMediaFiles,
 }: {
-  mediaFiles: File[];
-  setMediaFiles: (files: File[]) => void;
+  product: ProductType;
+  setProduct: (product: ProductType) => void;
+  uploadedMediaFiles: File[];
+  setUploadedMediaFiles: (files: File[]) => void;
 }) => {
   const [filesUploaded, setFilesUploaded] = useState<
     { file: File; tempUrl: string }[]
@@ -32,7 +39,7 @@ const FileUpload = ({
         return updatedFiles;
       });
 
-      setMediaFiles([...mediaFiles, uploadedMediaFile]);
+      setUploadedMediaFiles([...uploadedMediaFiles, uploadedMediaFile]);
     }
   };
 
@@ -46,10 +53,10 @@ const FileUpload = ({
       return updatedFiles;
     });
 
-    const updatedFiles = [...mediaFiles];
+    const updatedFiles = [...uploadedMediaFiles];
     updatedFiles.splice(index, 1);
 
-    setMediaFiles(updatedFiles);
+    setUploadedMediaFiles(updatedFiles);
   };
 
   useEffect(() => {}, [filesUploaded]);

@@ -10,6 +10,53 @@ export const getProducts = async ({ shopId }: { shopId: number }) => {
   return response;
 };
 
+export const getProduct = async ({
+  shopId,
+  productId,
+}: {
+  shopId: number;
+  productId: number;
+}) => {
+  const response = await prisma.product.findFirst({
+    where: { shopId, id: productId },
+    include: {
+      ProductMedia: {
+        include: {
+          media: {
+            select: {
+              id: true,
+              url: true,
+            },
+          },
+        },
+      },
+      ProductCategory: {
+        include: {
+          category: {
+            select: {
+              id: true,
+              title: true,
+            },
+          },
+        },
+      },
+    },
+  });
+
+  const product = {
+    ...response,
+    mediaFiles: response?.ProductMedia.map((pm) => pm.media),
+    selectedCategories: response?.ProductCategory.map((pm) => pm.category),
+  };
+
+  delete product.ProductMedia;
+  delete product.ProductCategory;
+
+  return product;
+};
+
+export type ProductType = Awaited<ReturnType<typeof getProduct>>;
+
 export const addProduct = async (
   data: Omit<Product, "id"> & { mediaIds: number[] } & {
     categoryIds: number[];

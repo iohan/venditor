@@ -14,5 +14,5 @@ export type Fields<T> = { [K in keyof T]?: Field<T> } & {
 export type TableProps<T> = {
   data: T[];
   fields: Fields<T>;
-  onClick: () => void;
+  onClick: (item: T) => void;
 };

@@ -1,8 +1,7 @@
 "use client";
 
-import { Category, Product } from "@prisma/client";
-import { FormEvent, useEffect, useState } from "react";
-import { submitNewProduct } from "./actions";
+import { Category } from "@prisma/client";
+import { FormEvent, useState } from "react";
 import { BookDashed, Check, LayoutList } from "lucide-react";
 import Button from "@/components/button/Button";
 import GeneralInfo from "./GeneralInfo";
@@ -12,38 +11,50 @@ import SelectCategory from "./SelectCategory";
 import { generateSku } from "@/utils/sku";
 import { numberOnly } from "@/utils/number-only";
 import FileUpload from "./FileUpload";
+import { ProductType } from "@/data-layer/product";
 
-export type SelectedCategory = { id?: number; title: string };
-
-export type NewProduct = Omit<Product, "id"> & {
-  selectedCategories: SelectedCategory[];
+const initialProduct: ProductType = {
+  title: "",
+  draft: true,
+  description: null,
+  stock: null,
+  basePrice: null,
+  discount: null,
+  sku: "",
+  shopId: 1,
+  selectedCategories: [],
+  mediaFiles: [],
 };
-const AddProductForm = ({ categories }: { categories: Category[] }) => {
-  const [product, setProduct] = useState<NewProduct>({
-    title: "",
-    draft: true,
-    description: null,
-    stock: null,
-    basePrice: null,
-    discount: null,
-    sku: "",
-    shopId: 1,
-    selectedCategories: [],
-  });
 
-  const [mediaFiles, setMediaFiles] = useState<File[]>([]);
+const ProductForm = ({
+  product,
+  action,
+  categories,
+}: {
+  product?: ProductType;
+  action: (
+    productData: ProductType,
+    uploadedMedia: FormData,
+  ) => Promise<unknown>;
+  categories: Category[];
+}) => {
+  const [productData, setProductData] = useState<ProductType>(
+    product ?? initialProduct,
+  );
+
+  const [uploadedMediaFiles, setUploadedMediaFiles] = useState<File[]>([]);
 
   const handleOnSubmit = async (evt: FormEvent<HTMLFormElement>) => {
     evt.preventDefault();
 
-    const mediaFormData = new FormData();
+    const uploadedMedia = new FormData();
 
-    mediaFiles.forEach((mediaFile) => {
-      mediaFormData.append("mediaFiles", mediaFile, mediaFile.name);
+    uploadedMediaFiles.forEach((mediaFile) => {
+      uploadedMedia.append("mediaFiles", mediaFile, mediaFile.name);
     });
 
     try {
-      const response = await submitNewProduct(product, mediaFormData);
+      const response = await action(productData, uploadedMedia);
       console.log(response);
     } catch (error) {
       console.error(error);
@@ -76,7 +87,7 @@ const AddProductForm = ({ categories }: { categories: Category[] }) => {
       </div>
       <div className="flex gap-5">
         <div className="basis-2/3 flex flex-col gap-5">
-          <GeneralInfo product={product} setProduct={setProduct} />
+          <GeneralInfo product={productData} setProduct={setProductData} />
           <ContainerBox>
             <div className="font-semibold text-lg mb-2">Pricing and stock</div>
             <div className="flex gap-3 basis-full">
@@ -84,9 +95,9 @@ const AddProductForm = ({ categories }: { categories: Category[] }) => {
                 name="base_price"
                 label="Base pricing"
                 onChange={(val) =>
-                  setProduct({ ...product, basePrice: numberOnly(val) })
+                  setProductData({ ...productData, basePrice: numberOnly(val) })
                 }
-                value={product.basePrice ?? undefined}
+                value={productData.basePrice ?? undefined}
                 placeholder="Base pricing"
               />
               <InputText
@@ -94,9 +105,9 @@ const AddProductForm = ({ categories }: { categories: Category[] }) => {
                 label="Stock"
                 placeholder="Stock"
                 onChange={(val) =>
-                  setProduct({ ...product, stock: numberOnly(val) })
+                  setProductData({ ...productData, stock: numberOnly(val) })
                 }
-                value={product.stock ?? undefined}
+                value={productData.stock ?? undefined}
               />
             </div>
             <div className="flex gap-3 basis-full">
@@ -104,29 +115,37 @@ const AddProductForm = ({ categories }: { categories: Category[] }) => {
                 name="discount"
                 label="Discount"
                 onChange={(val) =>
-                  setProduct({ ...product, discount: numberOnly(val) })
+                  setProductData({ ...productData, discount: numberOnly(val) })
                 }
-                value={product.discount ?? undefined}
+                value={productData.discount ?? undefined}
                 placeholder="Discount"
               />
               <InputText
                 name="sku"
                 onChange={(val) =>
-                  setProduct({ ...product, sku: generateSku(String(val)) })
+                  setProductData({
+                    ...productData,
+                    sku: generateSku(String(val)),
+                  })
                 }
                 label="SKU"
-                value={product.sku}
+                value={productData.sku}
                 placeholder="SKU"
               />
             </div>
           </ContainerBox>
         </div>
         <div className="basis-1/3 flex flex-col gap-5">
-          <FileUpload mediaFiles={mediaFiles} setMediaFiles={setMediaFiles} />
+          <FileUpload
+            product={productData}
+            setProduct={setProductData}
+            uploadedMediaFiles={uploadedMediaFiles}
+            setUploadedMediaFiles={setUploadedMediaFiles}
+          />
           <SelectCategory
             categories={categories}
-            product={product}
-            setProduct={setProduct}
+            product={productData}
+            setProduct={setProductData}
           />
         </div>
       </div>
@@ -134,4 +153,4 @@ const AddProductForm = ({ categories }: { categories: Category[] }) => {
   );
 };
 
-export default AddProductForm;
+export default ProductForm;

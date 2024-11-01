@@ -5,14 +5,14 @@ const TextArea = ({
   label,
   className,
   placeholder,
-  defaultValue,
+  value,
   onChange,
 }: {
   name: string;
   label?: string;
   className?: string;
   placeholder?: string;
-  defaultValue?: string;
+  value?: string;
   onChange?: (val: string) => void;
 }) => {
   return (
@@ -25,7 +25,7 @@ const TextArea = ({
         )}
         name={name}
         placeholder={placeholder}
-        defaultValue={defaultValue}
+        value={value}
         onChange={(e) => onChange && onChange(e.target.value)}
       ></textarea>
     </div>

@@ -5,6 +5,7 @@ import { Product } from "@prisma/client";
 import ContainerBox from "../_components/ContainerBox";
 import { Check, LayoutList } from "lucide-react";
 import Button from "@/components/button/Button";
+import { useRouter } from "next/navigation";
 
 const tableFields: Fields<Product> = {
   title: {
@@ -27,6 +28,8 @@ const tableFields: Fields<Product> = {
 };
 
 const ProductTable = ({ products }: { products: Product[] }) => {
+  const router = useRouter();
+
   return (
     <div className="flex flex-col">
       <div className="flex justify-between mb-5">
@@ -44,8 +47,9 @@ const ProductTable = ({ products }: { products: Product[] }) => {
         <Table
           data={products}
           fields={tableFields}
-          onClick={() => {
-            console.log("Hello");
+          onClick={(item) => {
+            router.push(`products/edit-product/${item.id}`);
+            console.log("Hello", item.id);
           }}
         />
       </ContainerBox>
