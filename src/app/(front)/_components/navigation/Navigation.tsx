@@ -65,7 +65,7 @@ const Navigation = ({ pathname }: { pathname: string }) => {
               Sign in
             </button>
           )}
-          <Link href="/cart" className="relative hover:text-amber-800">
+          <Link href="/shop/cart" className="relative hover:text-amber-800">
             <ShoppingBasket />
             <div className="animate-bounce-slow absolute -top-4 -right-3 flex items-center justify-center text-xs rounded-full bg-green-200 w-6 h-6 text-green-800 font-normal">
               {totalProductsInCart}

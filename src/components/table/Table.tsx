@@ -10,7 +10,7 @@ const Table = <T extends { id: number }>({
   const [selected, setSelected] = useState<T[]>([]);
 
   useEffect(() => {
-    if (selected.length > 0) {
+    if (selected.length > 0 && onSelected) {
       onSelected(selected);
     }
   }, [selected, onSelected]);

@@ -1,3 +1,5 @@
+"use server";
+
 import prisma from "@/utils/prisma";
 
 export interface ProductType {
@@ -29,6 +31,7 @@ export const getProductFromSlug = async ({
 
   const response = await prisma.product.findFirst({
     where: {
+      shopId,
       sku: productSlug,
     },
     include: {
@@ -99,6 +102,44 @@ export const getProductsInCategory = async ({
   }
 
   const products = response.ProductCategory.map((c) => c.product);
+
+  return products.map((p) => ({
+    id: p.id,
+    shopId,
+    title: p.title,
+    description: p.description ?? undefined,
+    stock: p.stock ?? undefined,
+    basePrice: p.basePrice ?? undefined,
+    discount: p.discount ?? undefined,
+    sku: p.sku,
+    mediaFiles:
+      p.ProductMedia.map((pm) => ({ id: pm.media.id, url: pm.media.url })) ??
+      [],
+  }));
+};
+
+export const getProducts = async ({
+  shopId,
+  productIds,
+}: {
+  shopId: number;
+  productIds: number[];
+}): Promise<ProductType[]> => {
+  const products = await prisma.product.findMany({
+    where: {
+      shopId,
+      id: {
+        in: productIds,
+      },
+    },
+    include: {
+      ProductMedia: {
+        select: {
+          media: true,
+        },
+      },
+    },
+  });
 
   return products.map((p) => ({
     id: p.id,
