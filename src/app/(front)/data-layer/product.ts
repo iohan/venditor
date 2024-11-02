@@ -5,11 +5,61 @@ export interface ProductType {
   shopId: number;
   title: string;
   discount?: number;
+  description?: string;
   stock?: number;
   basePrice?: number;
   sku: string;
   mediaFiles: { id: number; url: string }[];
 }
+
+export const getProductFromSlug = async ({
+  shopId,
+  productSlug,
+}: {
+  shopId: number;
+  productSlug: string;
+}): Promise<ProductType | undefined> => {
+  if (!shopId) {
+    throw new Error("shopId is require");
+  }
+
+  if (!productSlug) {
+    throw new Error("slug is require");
+  }
+
+  const response = await prisma.product.findFirst({
+    where: {
+      sku: productSlug,
+    },
+    include: {
+      ProductMedia: {
+        select: {
+          media: true,
+        },
+      },
+    },
+  });
+
+  if (!response) {
+    return;
+  }
+
+  return {
+    id: response.id,
+    shopId,
+    title: response.title,
+    description: response.description ?? undefined,
+    stock: response.stock ?? undefined,
+    basePrice: response.basePrice ?? undefined,
+    discount: response.discount ?? undefined,
+    sku: response.sku,
+    mediaFiles:
+      response.ProductMedia.map((pm) => ({
+        id: pm.media.id,
+        url: pm.media.url,
+      })) ?? [],
+  };
+};
 
 export const getProductsInCategory = async ({
   shopId,
@@ -54,6 +104,7 @@ export const getProductsInCategory = async ({
     id: p.id,
     shopId,
     title: p.title,
+    description: p.description ?? undefined,
     stock: p.stock ?? undefined,
     basePrice: p.basePrice ?? undefined,
     discount: p.discount ?? undefined,
