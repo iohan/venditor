@@ -9,7 +9,7 @@ const NewCategory = ({ onAdd }: { onAdd: (category: string) => void }) => {
     <>
       <InputText
         name="category_name"
-        onChange={(val) => setNewCategory(val)}
+        onChange={(val) => setNewCategory(String(val))}
         placeholder="Category name"
       />
       <Button primary onClick={() => onAdd(newCategory)}>

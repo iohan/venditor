@@ -69,3 +69,43 @@ export const getSignedURL = async (
 
   return { success: { url: signedUrl, mediaId: newMediaRef.id } };
 };
+
+export const removeMediaFiles = async ({
+  shopId,
+  mediaFiles,
+  productId,
+}: {
+  shopId: number;
+  mediaFiles: number[];
+  productId: number;
+}): Promise<void> => {
+  const session = await auth();
+
+  if (!session) {
+    redirect("/api/auth/signin");
+  }
+
+  if (!shopId) {
+    throw new Error("shopId is required");
+  }
+
+  const deleteProductConnection = prisma.productMedia.deleteMany({
+    where: {
+      productId,
+      mediaId: {
+        in: mediaFiles,
+      },
+    },
+  });
+
+  const deleteMediaFiles = prisma.media.deleteMany({
+    where: {
+      shopId,
+      id: {
+        in: mediaFiles,
+      },
+    },
+  });
+
+  await prisma.$transaction([deleteProductConnection, deleteMediaFiles]);
+};

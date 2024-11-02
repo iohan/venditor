@@ -1,29 +1,17 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import pinkBeenies from "@/images/pink-beenies.webp";
 import Link from "next/link";
 import { ChevronLeft } from "lucide-react";
-import { useAuth } from "@/hooks/useAuth";
 
 export default function SignIn() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
-  const { isAuthenticated, loading } = useAuth();
-
-  useEffect(() => {
-    if (isAuthenticated && !loading) {
-      router.push("/admin");
-    }
-  }, [isAuthenticated, loading, router]);
-
-  if (loading) {
-    return <>...Loading</>;
-  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -43,6 +31,7 @@ export default function SignIn() {
       setError(data.message);
     }
   };
+  return <>This page needs an overhaul</>;
 
   return (
     <div className="bg-red-100 px-10 h-screen flex items-center relative">

@@ -8,16 +8,70 @@ import prisma from "@/utils/prisma";
 export interface ProductType {
   id?: number;
   shopId?: number;
-  title?: string;
+  title: string;
   draft: boolean;
-  description: string | null;
-  stock: number | null;
-  basePrice: number | null;
-  discount: number | null;
+  description?: string;
+  stock?: number;
+  basePrice?: number;
+  discount?: number;
   sku: string;
   selectedCategories: { id?: number; title: string }[];
   mediaFiles: { id: number; url: string }[];
 }
+
+interface UpdateProductInput {
+  id: number;
+  shopId: number;
+  title: string;
+  draft: boolean;
+  description?: string;
+  stock?: number;
+  basePrice?: number;
+  discount?: number;
+  sku: string;
+  selectedCategories: number[];
+  newMediaFiles: number[];
+}
+
+export const getProductMediaFiles = async ({
+  shopId,
+  productId,
+}: {
+  shopId: number;
+  productId: number;
+}): Promise<{ mediaFiles: { id: number; url: string }[] }> => {
+  const session = await auth();
+
+  if (!session) {
+    redirect("/api/auth/signin");
+  }
+
+  if (!shopId) {
+    throw new Error("shopId is required");
+  }
+
+  const response = await prisma.product.findFirst({
+    where: { shopId, id: productId },
+    select: {
+      ProductMedia: {
+        include: {
+          media: {
+            select: {
+              id: true,
+              url: true,
+            },
+          },
+        },
+      },
+    },
+  });
+
+  return response
+    ? {
+        mediaFiles: response.ProductMedia.map((m) => m.media),
+      }
+    : { mediaFiles: [] };
+};
 
 export const getProducts = async ({ shopId }: { shopId: number }) => {
   const session = await auth();
@@ -85,15 +139,68 @@ export const getProduct = async ({
     shopId,
     title: response.title,
     draft: response.draft,
-    description: response.description,
-    stock: response.stock,
-    basePrice: response.basePrice,
-    discount: response.discount,
+    description: response.description ?? undefined,
+    stock: response.stock ?? undefined,
+    basePrice: response.basePrice ?? undefined,
+    discount: response.discount ?? undefined,
     sku: response.sku,
     mediaFiles: response?.ProductMedia.map((pm) => pm.media) ?? [],
     selectedCategories:
       response?.ProductCategory.map((pm) => pm.category) ?? [],
   };
+};
+
+export const updateProduct = async (data: UpdateProductInput) => {
+  const session = await auth();
+
+  if (!session) {
+    redirect("/api/auth/signin");
+  }
+
+  if (!data.shopId) {
+    throw new Error("shopId is required");
+  }
+
+  await prisma.product.update({
+    where: {
+      id: data.id,
+      shopId: data.shopId,
+    },
+    data: {
+      title: data.title,
+      description: data.description,
+      draft: data.draft,
+      shopId: data.shopId,
+      sku: data.sku,
+      discount: data.discount,
+      basePrice: data.basePrice,
+      stock: data.stock,
+    },
+  });
+
+  if (data.newMediaFiles.length > 0 && data.id) {
+    await prisma.productMedia.createMany({
+      data: data.newMediaFiles.map((id) => ({
+        productId: data.id,
+        mediaId: id,
+      })),
+    });
+  }
+
+  if (data.selectedCategories.length > 0 && data.id) {
+    await prisma.productCategory.deleteMany({
+      where: {
+        productId: data.id,
+      },
+    });
+
+    await prisma.productCategory.createMany({
+      data: data.selectedCategories.map((id) => ({
+        productId: data.id,
+        categoryId: id,
+      })),
+    });
+  }
 };
 
 export const addProduct = async (

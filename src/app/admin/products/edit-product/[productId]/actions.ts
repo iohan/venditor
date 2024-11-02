@@ -1,7 +1,11 @@
 "use server";
 
-import { getSignedURL } from "@/data-layer/media";
-import { addProduct, ProductType } from "@/data-layer/product";
+import { getSignedURL, removeMediaFiles } from "@/data-layer/media";
+import {
+  getProductMediaFiles,
+  ProductType,
+  updateProduct,
+} from "@/data-layer/product";
 import { auth } from "@/utils/auth";
 import { computeFileChecksum } from "@/utils/compute-file-checksum";
 import { redirect } from "next/navigation";
@@ -21,19 +25,51 @@ export const submitUpdateProduct = async (
     throw new Error("shopId is required");
   }
 
-  const mediaFiles = mediaFormData.getAll("mediaFiles");
-  const mediaObjIds: number[] = [];
+  if (!product.id) {
+    throw new Error("Product Id is required");
+  }
 
-  if (mediaFiles) {
+  // MediaFiles
+  // - Upload new files
+  // - Remove media files, both Db and S3
+
+  // Remove media files
+  const productMediaFiles = await getProductMediaFiles({
+    shopId: product.shopId,
+    productId: product.id,
+  });
+
+  const mediaIdsToRemove: number[] = [];
+  productMediaFiles.mediaFiles.forEach((mediaFile) => {
+    if (!product.mediaFiles.some((m) => m.id === mediaFile.id)) {
+      mediaIdsToRemove.push(mediaFile.id);
+    }
+  });
+
+  if (mediaIdsToRemove.length > 0) {
+    await removeMediaFiles({
+      shopId: product.shopId,
+      productId: product.id,
+      mediaFiles: mediaIdsToRemove,
+    });
+
+    // TODO: Remove from S3
+  }
+
+  // Upload new media files
+  const uploadedFiles = uploadedMedia.getAll("mediaFiles");
+  const uploadedMediaIds: number[] = [];
+
+  if (uploadedFiles) {
     await Promise.all(
-      mediaFiles.map(async (mediaFile) => {
-        if (mediaFile && mediaFile instanceof File) {
+      uploadedFiles.map(async (uploadedFile) => {
+        if (uploadedFile && uploadedFile instanceof File) {
           try {
-            const checksum = await computeFileChecksum(mediaFile);
+            const checksum = await computeFileChecksum(uploadedFile);
 
             const signedUrlResult = await getSignedURL(
-              mediaFile.type,
-              mediaFile.size,
+              uploadedFile.type,
+              uploadedFile.size,
               checksum,
             );
 
@@ -42,14 +78,13 @@ export const submitUpdateProduct = async (
             }
 
             const { url, mediaId } = signedUrlResult.success;
-            console.log(mediaId);
-            mediaObjIds.push(mediaId);
+            uploadedMediaIds.push(mediaId);
 
             await fetch(url, {
               method: "PUT",
-              body: mediaFile,
+              body: uploadedFile,
               headers: {
-                "Content-Type": mediaFile.type,
+                "Content-Type": uploadedFile.type,
               },
             });
           } catch (e) {
@@ -79,19 +114,18 @@ export const submitUpdateProduct = async (
     }
   });
 
-  console.log("MEDIA", mediaObjIds);
-
-  await addProduct({
+  await updateProduct({
+    id: product.id,
     title: product.title,
     description: product.description,
-    draft: false,
-    shopId: 1,
-    mediaIds: mediaObjIds,
+    draft: product.draft,
+    shopId: product.shopId,
+    newMediaFiles: [...uploadedMediaIds],
     sku: product.sku,
     basePrice: product.basePrice,
     stock: product.stock,
     discount: product.discount,
-    categoryIds: [...selectedCategoryIds, ...newCategoryIds],
+    selectedCategories: [...selectedCategoryIds, ...newCategoryIds],
   });
 
   return { status: "success", message: "New product successfully added" };
