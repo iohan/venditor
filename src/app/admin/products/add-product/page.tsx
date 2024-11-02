@@ -1,7 +1,8 @@
 import { redirect } from "next/navigation";
-import AddProductForm from "./AddProductForm";
 import { getCategories } from "@/data-layer/category";
 import { auth } from "@/utils/auth";
+import ProductForm from "../_components/ProductForm";
+import { submitNewProduct } from "./actions";
 
 export default async function AddProduct() {
   const session = await auth();
@@ -12,5 +13,11 @@ export default async function AddProduct() {
 
   const categories = await getCategories(1); // TODO: Change to a dynamic shopId
 
-  return <AddProductForm categories={categories} />;
+  return (
+    <ProductForm
+      type={"add"}
+      action={submitNewProduct}
+      categories={categories}
+    />
+  );
 }

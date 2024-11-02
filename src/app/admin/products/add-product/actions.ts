@@ -1,15 +1,14 @@
 "use server";
 
 import { getSignedURL } from "@/data-layer/media";
-import { addProduct } from "@/data-layer/product";
+import { addProduct, ProductType } from "@/data-layer/product";
 import { auth } from "@/utils/auth";
 import { computeFileChecksum } from "@/utils/compute-file-checksum";
 import { redirect } from "next/navigation";
-import { NewProduct } from "./AddProductForm";
 import { addCategories } from "@/data-layer/category";
 
 export const submitNewProduct = async (
-  product: NewProduct,
+  product: ProductType,
   mediaFormData: FormData,
 ) => {
   const session = await auth();
@@ -61,8 +60,6 @@ export const submitNewProduct = async (
     );
   }
 
-  console.log(mediaObjIds);
-
   const newCategories = product.selectedCategories.filter((c) => !c.id);
   let newCategoryIds: number[] = [];
   const selectedCategoryIds: number[] = [];
@@ -82,19 +79,17 @@ export const submitNewProduct = async (
     }
   });
 
-  console.log("MEDIA", mediaObjIds);
-
   await addProduct({
     title: product.title,
     description: product.description,
     draft: false,
     shopId: 1,
-    mediaIds: mediaObjIds,
+    newMediaFiles: [...mediaObjIds],
     sku: product.sku,
     basePrice: product.basePrice,
     stock: product.stock,
     discount: product.discount,
-    categoryIds: [...selectedCategoryIds, ...newCategoryIds],
+    selectedCategories: [...selectedCategoryIds, ...newCategoryIds],
   });
 
   return { status: "success", message: "New product successfully added" };

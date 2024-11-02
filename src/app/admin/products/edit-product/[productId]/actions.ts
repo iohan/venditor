@@ -30,8 +30,6 @@ export const submitUpdateProduct = async (
   }
 
   // MediaFiles
-  // - Upload new files
-  // - Remove media files, both Db and S3
 
   // Remove media files
   const productMediaFiles = await getProductMediaFiles({
@@ -52,8 +50,6 @@ export const submitUpdateProduct = async (
       productId: product.id,
       mediaFiles: mediaIdsToRemove,
     });
-
-    // TODO: Remove from S3
   }
 
   // Upload new media files

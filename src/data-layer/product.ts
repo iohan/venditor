@@ -1,7 +1,6 @@
 "use server";
 
 import { auth } from "@/utils/auth";
-import { Product } from "@prisma/client";
 import { redirect } from "next/navigation";
 import prisma from "@/utils/prisma";
 
@@ -19,8 +18,7 @@ export interface ProductType {
   mediaFiles: { id: number; url: string }[];
 }
 
-interface UpdateProductInput {
-  id: number;
+interface ProductInput {
   shopId: number;
   title: string;
   draft: boolean;
@@ -32,6 +30,12 @@ interface UpdateProductInput {
   selectedCategories: number[];
   newMediaFiles: number[];
 }
+
+type AddProductInput = ProductInput;
+
+type UpdateProductInput = ProductInput & {
+  id: number;
+};
 
 export const getProductMediaFiles = async ({
   shopId,
@@ -203,11 +207,7 @@ export const updateProduct = async (data: UpdateProductInput) => {
   }
 };
 
-export const addProduct = async (
-  data: Omit<Product, "id"> & { mediaIds: number[] } & {
-    categoryIds: number[];
-  },
-) => {
+export const addProduct = async (data: AddProductInput) => {
   const session = await auth();
 
   if (!session) {
@@ -233,18 +233,18 @@ export const addProduct = async (
 
   const productId = newProduct.id;
 
-  if (data.mediaIds.length > 0 && productId) {
+  if (data.newMediaFiles.length > 0 && productId) {
     await prisma.productMedia.createMany({
-      data: data.mediaIds.map((id) => ({
+      data: data.newMediaFiles.map((id) => ({
         productId,
         mediaId: id,
       })),
     });
   }
 
-  if (data.categoryIds.length > 0 && productId) {
+  if (data.selectedCategories.length > 0 && productId) {
     await prisma.productCategory.createMany({
-      data: data.categoryIds.map((id) => ({
+      data: data.selectedCategories.map((id) => ({
         productId,
         categoryId: id,
       })),

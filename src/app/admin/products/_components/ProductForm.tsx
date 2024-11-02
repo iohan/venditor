@@ -2,8 +2,6 @@
 
 import { Category } from "@prisma/client";
 import { FormEvent, useEffect, useRef, useState } from "react";
-import { BookDashed, Check, LayoutList } from "lucide-react";
-import Button from "@/components/button/Button";
 import GeneralInfo from "./GeneralInfo";
 import ContainerBox from "../../_components/ContainerBox";
 import InputText from "@/components/form/InputText";
