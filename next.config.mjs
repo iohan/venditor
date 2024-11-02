@@ -4,7 +4,7 @@ const nextConfig = {
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "https://venditor-bucket.s3.eu-north-1.amazonaws.com",
+        hostname: "venditor-bucket.s3.eu-north-1.amazonaws.com",
       },
     ],
   },

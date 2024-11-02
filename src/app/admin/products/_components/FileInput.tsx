@@ -1,5 +1,6 @@
 import { cx } from "@/utils/cx";
 import { CirclePlus } from "lucide-react";
+import Image from "next/image";
 import { ChangeEvent, useRef } from "react";
 
 const FileInput = ({
@@ -48,9 +49,12 @@ const FileInput = ({
         onClick={handleClick}
       >
         {image ? (
-          <img
+          <Image
             src={image}
+            alt={""}
             className="absolute inset-0 object-cover w-full h-full"
+            width={300}
+            height={300}
           />
         ) : (
           <CirclePlus className="text-gray-300 group-hover:text-amber-700" />

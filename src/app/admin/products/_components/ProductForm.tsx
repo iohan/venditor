@@ -45,6 +45,7 @@ const ProductForm = ({
   );
 
   const initialProductRef = useRef<ProductType>(product ?? initialProduct);
+  const initialMediaFilesRef = useRef<File[]>([]);
 
   const [uploadedMediaFiles, setUploadedMediaFiles] = useState<File[]>([]);
 
@@ -71,12 +72,17 @@ const ProductForm = ({
 
   useEffect(() => {
     if (!changesMade) {
-      setChangesMade(
+      const productDataChanged =
         JSON.stringify(productData) !==
-          JSON.stringify(initialProductRef.current),
-      );
+        JSON.stringify(initialProductRef.current);
+
+      const mediaFilesChanged =
+        JSON.stringify(uploadedMediaFiles) !==
+        JSON.stringify(initialMediaFilesRef.current);
+
+      setChangesMade(productDataChanged || mediaFilesChanged);
     }
-  }, [productData, changesMade]);
+  }, [productData, changesMade, uploadedMediaFiles]);
 
   return (
     <form onSubmit={handleOnSubmit}>
