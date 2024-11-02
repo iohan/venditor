@@ -61,12 +61,69 @@ model VerificationToken {
   @@id([identifier, token])
 }
 
+model OrderProduct {
+  id        Int    @id @default(autoincrement())
+  Order     Order  @relation(fields: [orderId], references: [id])
+  orderId   Int
+  productId Int
+  title     String
+  amount    Int
+  media     String
+  price     Int
+}
+
+model OrderShipping {
+  id    Int    @id @default(autoincrement())
+  title String
+  price Int
+  order Order?
+}
+
+model Order {
+  id              Int            @id @default(autoincrement())
+  Shop            Shop           @relation(fields: [shopId], references: [id])
+  shopId          Int
+  Customer        Customer       @relation(fields: [customerId], references: [id])
+  customerId      Int
+  OrderProduct    OrderProduct[]
+  OrderShipping   OrderShipping  @relation(fields: [orderShippingId], references: [id])
+  orderShippingId Int            @unique
+}
+
+model Customer {
+  id           Int            @id @default(autoincrement())
+  email        String         @unique
+  ShopCustomer ShopCustomer[]
+  Order        Order[]
+}
+
+model ShopCustomer {
+  customer   Customer @relation(fields: [customerId], references: [id])
+  customerId Int
+  shop       Shop     @relation(fields: [shopId], references: [id])
+  shopId     Int
+
+  @@id([customerId, shopId])
+}
+
+model Shipping {
+  id          Int     @id @default(autoincrement())
+  title       String
+  description String?
+  basePrice   Int
+  Shop        Shop?   @relation(fields: [shopId], references: [id])
+  shopId      Int?
+}
+
 model Shop {
-  id       Int        @id @default(autoincrement())
-  title    String
-  Category Category[]
-  Product  Product[]
-  Media    Media[]
+  id           Int            @id @default(autoincrement())
+  title        String
+  Category     Category[]
+  Product      Product[]
+  Media        Media[]
+  Order        Order[]
+  ShopCustomer ShopCustomer[]
+  Shipping     Shipping[]
 }
 
 model Category {
