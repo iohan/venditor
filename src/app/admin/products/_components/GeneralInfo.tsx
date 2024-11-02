@@ -1,7 +1,7 @@
 import InputText from "@/components/form/InputText";
 import ContainerBox from "../../_components/ContainerBox";
 import TextArea from "@/components/form/TextArea";
-import { generateSku } from "@/utils/sku";
+import { generateSlug } from "@/utils/slug";
 import { ProductType } from "@/data-layer/product";
 
 const GeneralInfo = ({
@@ -23,7 +23,7 @@ const GeneralInfo = ({
           setProduct({
             ...product,
             title: String(val),
-            sku: generateSku(String(val)),
+            sku: generateSlug(String(val)),
           })
         }
       />

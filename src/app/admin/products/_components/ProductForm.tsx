@@ -6,7 +6,7 @@ import GeneralInfo from "./GeneralInfo";
 import ContainerBox from "../../_components/ContainerBox";
 import InputText from "@/components/form/InputText";
 import SelectCategory from "./SelectCategory";
-import { generateSku } from "@/utils/sku";
+import { generateSlug } from "@/utils/slug";
 import { numberOnly } from "@/utils/number-only";
 import FileUpload from "./FileUpload";
 import { ProductType } from "@/data-layer/product";
@@ -127,7 +127,7 @@ const ProductForm = ({
                 onChange={(val) =>
                   setProductData({
                     ...productData,
-                    sku: generateSku(String(val)),
+                    sku: generateSlug(String(val)),
                   })
                 }
                 label="SKU"

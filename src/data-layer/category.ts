@@ -2,6 +2,7 @@
 
 import { auth } from "@/utils/auth";
 import prisma from "@/utils/prisma";
+import { generateSlug } from "@/utils/slug";
 import { redirect } from "next/navigation";
 
 export const removeCategoryConnections = async ({
@@ -51,6 +52,18 @@ export const getCategories = async (shopId: number) => {
   return response;
 };
 
+const generateUniqueCategorySlug = async (baseSlug: string, shopId: number) => {
+  let slug = baseSlug;
+  let counter = 1;
+
+  while (await prisma.category.findFirst({ where: { slug, shopId } })) {
+    slug = `${baseSlug}-${counter}`;
+    counter++;
+  }
+
+  return slug;
+};
+
 export const addCategories = async (titles: string[], shopId: number) => {
   const session = await auth();
 
@@ -63,10 +76,17 @@ export const addCategories = async (titles: string[], shopId: number) => {
   }
 
   const response = await prisma.category.createManyAndReturn({
-    data: titles.map((t) => ({
-      title: t,
-      shopId,
-    })),
+    data: await Promise.all(
+      titles.map(async (t) => {
+        const baseSlug = generateSlug(t);
+        const uniqueSlug = await generateUniqueCategorySlug(baseSlug, shopId);
+        return {
+          title: t,
+          shopId,
+          slug: uniqueSlug,
+        };
+      }),
+    ),
   });
 
   return response;

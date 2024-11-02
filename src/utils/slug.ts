@@ -1,4 +1,4 @@
-export const generateSku = (inputString: string) => {
+export const generateSlug = (inputString: string) => {
   // Replace space with hyphen
   inputString = inputString.replace(/[\s]/g, "-").toLowerCase();
 
