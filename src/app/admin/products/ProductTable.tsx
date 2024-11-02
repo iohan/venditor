@@ -3,9 +3,11 @@ import Table from "@/components/table/Table";
 import { Fields } from "@/components/table/types";
 import { Product } from "@prisma/client";
 import ContainerBox from "../_components/ContainerBox";
-import { Check, LayoutList } from "lucide-react";
+import { Check, LayoutList, Trash2 } from "lucide-react";
 import Button from "@/components/button/Button";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { deleteProducts } from "@/data-layer/product";
 
 const tableFields: Fields<Product> = {
   title: {
@@ -29,6 +31,14 @@ const tableFields: Fields<Product> = {
 
 const ProductTable = ({ products }: { products: Product[] }) => {
   const router = useRouter();
+  const [selectedProducts, setSelectedProducts] = useState<Product[]>([]);
+
+  const handleDeleteProducts = async () => {
+    await deleteProducts({
+      shopId: 1,
+      productIds: selectedProducts.map((s) => s.id),
+    });
+  };
 
   return (
     <div className="flex flex-col">
@@ -38,6 +48,11 @@ const ProductTable = ({ products }: { products: Product[] }) => {
           <div className="text-xl font-semibold">Products</div>
         </div>
         <div className="flex gap-3">
+          {selectedProducts.length > 0 && (
+            <Button primary icon={Trash2} onClick={handleDeleteProducts}>
+              Delete
+            </Button>
+          )}
           <Button primary icon={Check} href={"products/add-product"}>
             Add Product
           </Button>
@@ -47,9 +62,11 @@ const ProductTable = ({ products }: { products: Product[] }) => {
         <Table
           data={products}
           fields={tableFields}
+          onSelected={(selectedProducts) =>
+            setSelectedProducts(selectedProducts)
+          }
           onClick={(item) => {
             router.push(`products/edit-product/${item.id}`);
-            console.log("Hello", item.id);
           }}
         />
       </ContainerBox>

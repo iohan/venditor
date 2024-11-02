@@ -15,4 +15,5 @@ export type TableProps<T> = {
   data: T[];
   fields: Fields<T>;
   onClick: (item: T) => void;
+  onSelected: (selectedItems: T[]) => void;
 };

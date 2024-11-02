@@ -1,10 +1,20 @@
+import { useEffect, useState } from "react";
 import { TableProps } from "./types";
 
 const Table = <T extends { id: number }>({
   data,
   fields,
+  onSelected,
   onClick,
 }: TableProps<T>) => {
+  const [selected, setSelected] = useState<T[]>([]);
+
+  useEffect(() => {
+    if (selected.length > 0) {
+      onSelected(selected);
+    }
+  }, [selected, onSelected]);
+
   return (
     <table className="table-fixed w-full">
       <thead>
@@ -25,7 +35,16 @@ const Table = <T extends { id: number }>({
           return (
             <tr key={item.id} className="border-b-2">
               <td className="p-2">
-                <input type="checkbox" />
+                <input
+                  type="checkbox"
+                  onClick={(evt) =>
+                    evt.currentTarget.checked
+                      ? setSelected((prev) => [...prev, item])
+                      : setSelected((prev) =>
+                          prev.filter((s) => s.id !== item.id),
+                        )
+                  }
+                />
               </td>
               {Object.keys(fields).map((field, i) => {
                 const Presentation = fields[field].presentation;

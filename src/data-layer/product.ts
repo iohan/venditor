@@ -3,6 +3,8 @@
 import { auth } from "@/utils/auth";
 import { redirect } from "next/navigation";
 import prisma from "@/utils/prisma";
+import { removeMediaFiles } from "./media";
+import { removeCategoryConnections } from "./category";
 
 export interface ProductType {
   id?: number;
@@ -250,4 +252,59 @@ export const addProduct = async (data: AddProductInput) => {
       })),
     });
   }
+};
+
+export const deleteProducts = async ({
+  shopId,
+  productIds,
+}: {
+  shopId: number;
+  productIds: number[];
+}) => {
+  const session = await auth();
+
+  if (!session) {
+    redirect("/api/auth/signin");
+  }
+
+  if (!shopId) {
+    throw new Error("shopId is required");
+  }
+
+  // Delete dependencies
+  await Promise.all(
+    productIds.map(async (id) => {
+      try {
+        const product = await getProduct({ shopId, productId: id });
+        // Delete media files
+        if (product.mediaFiles.length > 0) {
+          await removeMediaFiles({
+            shopId,
+            mediaFiles: product.mediaFiles.map((m) => m.id),
+            productId: id,
+          });
+        }
+
+        // Delete category connections
+        if (product.selectedCategories.length > 0) {
+          await removeCategoryConnections({
+            categories: product.selectedCategories.map((c) => Number(c.id)),
+            productId: id,
+          });
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    }),
+  );
+
+  // Delete products
+  await prisma.product.deleteMany({
+    where: {
+      shopId,
+      id: {
+        in: productIds,
+      },
+    },
+  });
 };
