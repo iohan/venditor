@@ -5,9 +5,11 @@ import { ShoppingBasket, User } from "lucide-react";
 import Link from "next/link";
 import { signIn, useSession } from "next-auth/react";
 import Spinner from "@/components/spinner/Spinner";
+import useCartStore from "@/stores/cart-store";
 
 const Navigation = ({ pathname }: { pathname: string }) => {
   const { status } = useSession();
+  const totalProductsInCart = useCartStore((state) => state.totalProducts);
 
   const links = [
     {
@@ -65,8 +67,8 @@ const Navigation = ({ pathname }: { pathname: string }) => {
           )}
           <Link href="/cart" className="relative hover:text-amber-800">
             <ShoppingBasket />
-            <div className="animate-bounce absolute -top-3 -right-2 text-xs rounded-full bg-green-200 w-4 h-4 text-green-800 text-center font-normal">
-              5
+            <div className="animate-bounce-slow absolute -top-4 -right-3 flex items-center justify-center text-xs rounded-full bg-green-200 w-6 h-6 text-green-800 font-normal">
+              {totalProductsInCart}
             </div>
           </Link>
         </div>

@@ -4,8 +4,16 @@ import { MoveLeft } from "lucide-react";
 import { ProductType } from "../../data-layer/product";
 import Image from "next/image";
 import { cx } from "@/utils/cx";
+import InputText from "@/components/form/InputText";
+import { useState } from "react";
+import { numberOnly } from "@/utils/number-only";
+import Button from "@/components/button/Button";
+import useCartStore from "@/stores/cart-store";
 
 const ProductDetails = ({ product }: { product?: ProductType }) => {
+  const [amount, setAmount] = useState<number | undefined>(1);
+  const addProductToCart = useCartStore((state) => state.addProduct);
+
   if (!product) {
     return <>Not found</>;
   }
@@ -62,6 +70,22 @@ const ProductDetails = ({ product }: { product?: ProductType }) => {
           <div className="text-sm font-dmSans">{product.description}</div>
           <div className="mt-5 text-3xl text-semibold font-dmSans">
             {product.basePrice}kr
+          </div>
+          <div className="flex flex-col gap-3 mt-5">
+            <InputText
+              name="amount"
+              value={amount}
+              onChange={(value) => setAmount(numberOnly(value))}
+            />
+            <Button
+              primary
+              onClick={() =>
+                amount !== undefined &&
+                addProductToCart({ id: product.id, amount })
+              }
+            >
+              Add to cart
+            </Button>
           </div>
         </div>
       </div>

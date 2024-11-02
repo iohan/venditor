@@ -14,7 +14,8 @@ const config: Config = {
     },
     extend: {
       animation: {
-        "spin-slow": "spin 3s linear infinite",
+        "spin-slow": "spin 5s linear infinite",
+        "bounce-slow": "bounce 3s linear infinite",
       },
       colors: {
         background: "var(--background)",
