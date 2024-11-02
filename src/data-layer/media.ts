@@ -3,7 +3,11 @@
 import { auth } from "@/utils/auth";
 import { generateUniqueFileName } from "@/utils/generate-unique-file-name";
 import prisma from "@/utils/prisma";
-import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
+import {
+  S3Client,
+  PutObjectCommand,
+  DeleteObjectsCommand,
+} from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { redirect } from "next/navigation";
 
@@ -89,6 +93,17 @@ export const removeMediaFiles = async ({
     throw new Error("shopId is required");
   }
 
+  const mediaFileUrls = await prisma.media.findMany({
+    where: {
+      id: {
+        in: mediaFiles,
+      },
+    },
+    select: {
+      url: true,
+    },
+  });
+
   const deleteProductConnection = prisma.productMedia.deleteMany({
     where: {
       productId,
@@ -108,4 +123,18 @@ export const removeMediaFiles = async ({
   });
 
   await prisma.$transaction([deleteProductConnection, deleteMediaFiles]);
+
+  const keysToDelete = mediaFileUrls.map((m) => ({
+    Key: m.url.split("/").pop()!,
+  }));
+
+  const deleteObjectsCommand = new DeleteObjectsCommand({
+    Bucket: process.env.AWS_BUCKET_NAME,
+    Delete: {
+      Objects: keysToDelete,
+      Quiet: true,
+    },
+  });
+
+  await s3.send(deleteObjectsCommand);
 };
