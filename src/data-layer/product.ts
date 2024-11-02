@@ -5,7 +5,31 @@ import { Product } from "@prisma/client";
 import { redirect } from "next/navigation";
 import prisma from "@/utils/prisma";
 
+export interface ProductType {
+  id?: number;
+  shopId?: number;
+  title?: string;
+  draft: boolean;
+  description: string | null;
+  stock: number | null;
+  basePrice: number | null;
+  discount: number | null;
+  sku: string;
+  selectedCategories: { id?: number; title: string }[];
+  mediaFiles: { id: number; url: string }[];
+}
+
 export const getProducts = async ({ shopId }: { shopId: number }) => {
+  const session = await auth();
+
+  if (!session) {
+    redirect("/api/auth/signin");
+  }
+
+  if (!shopId) {
+    throw new Error("shopId is required");
+  }
+
   const response = await prisma.product.findMany({ where: { shopId } });
   return response;
 };
@@ -16,7 +40,17 @@ export const getProduct = async ({
 }: {
   shopId: number;
   productId: number;
-}) => {
+}): Promise<ProductType> => {
+  const session = await auth();
+
+  if (!session) {
+    redirect("/api/auth/signin");
+  }
+
+  if (!shopId) {
+    throw new Error("shopId is required");
+  }
+
   const response = await prisma.product.findFirst({
     where: { shopId, id: productId },
     include: {
@@ -42,20 +76,25 @@ export const getProduct = async ({
       },
     },
   });
+  if (!response) {
+    throw new Error("Could'nt find a product");
+  }
 
-  const product = {
-    ...response,
-    mediaFiles: response?.ProductMedia.map((pm) => pm.media),
-    selectedCategories: response?.ProductCategory.map((pm) => pm.category),
+  return {
+    id: response.id,
+    shopId,
+    title: response.title,
+    draft: response.draft,
+    description: response.description,
+    stock: response.stock,
+    basePrice: response.basePrice,
+    discount: response.discount,
+    sku: response.sku,
+    mediaFiles: response?.ProductMedia.map((pm) => pm.media) ?? [],
+    selectedCategories:
+      response?.ProductCategory.map((pm) => pm.category) ?? [],
   };
-
-  delete product.ProductMedia;
-  delete product.ProductCategory;
-
-  return product;
 };
-
-export type ProductType = Awaited<ReturnType<typeof getProduct>>;
 
 export const addProduct = async (
   data: Omit<Product, "id"> & { mediaIds: number[] } & {

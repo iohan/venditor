@@ -11,6 +11,7 @@ const NewCategory = ({ onAdd }: { onAdd: (category: string) => void }) => {
         name="category_name"
         onChange={(val) => setNewCategory(String(val))}
         placeholder="Category name"
+        value={newCategory}
       />
       <Button primary onClick={() => onAdd(newCategory)}>
         Add new Category
