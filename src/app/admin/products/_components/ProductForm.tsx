@@ -1,7 +1,7 @@
 "use client";
 
 import { Category } from "@prisma/client";
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, useEffect, useRef, useState } from "react";
 import { BookDashed, Check, LayoutList } from "lucide-react";
 import Button from "@/components/button/Button";
 import GeneralInfo from "./GeneralInfo";
@@ -12,6 +12,7 @@ import { generateSku } from "@/utils/sku";
 import { numberOnly } from "@/utils/number-only";
 import FileUpload from "./FileUpload";
 import { ProductType } from "@/data-layer/product";
+import Header from "./Header";
 
 const initialProduct: ProductType = {
   title: "",
@@ -30,6 +31,7 @@ const ProductForm = ({
   product,
   action,
   categories,
+  type,
 }: {
   product?: ProductType;
   action: (
@@ -37,10 +39,14 @@ const ProductForm = ({
     uploadedMedia: FormData,
   ) => Promise<unknown>;
   categories: Category[];
+  type: "add" | "edit";
 }) => {
+  const [changesMade, setChangesMade] = useState<boolean>(type == "add");
   const [productData, setProductData] = useState<ProductType>(
     product ?? initialProduct,
   );
+
+  const initialProductRef = useRef<ProductType>(product ?? initialProduct);
 
   const [uploadedMediaFiles, setUploadedMediaFiles] = useState<File[]>([]);
 
@@ -66,29 +72,17 @@ const ProductForm = ({
   };
 
   useEffect(() => {
-    console.log(productData);
-  }, [productData]);
+    if (!changesMade) {
+      setChangesMade(
+        JSON.stringify(productData) !==
+          JSON.stringify(initialProductRef.current),
+      );
+    }
+  }, [productData, changesMade]);
 
   return (
     <form onSubmit={handleOnSubmit}>
-      <div className="flex justify-between mb-5">
-        <div className="flex gap-2 items-center">
-          <LayoutList size={20} className="text-amber-700/75" />
-          <div className="text-xl font-semibold">Add new product</div>
-        </div>
-        <div className="flex gap-3">
-          <Button
-            secondary
-            icon={BookDashed}
-            onClick={() => console.log("Save draft")}
-          >
-            Save Draft
-          </Button>
-          <Button primary icon={Check} type="submit">
-            Add Product
-          </Button>
-        </div>
-      </div>
+      <Header type={type} draft={productData.draft} changesMade={changesMade} />
       <div className="flex gap-5">
         <div className="basis-2/3 flex flex-col gap-5">
           <GeneralInfo product={productData} setProduct={setProductData} />

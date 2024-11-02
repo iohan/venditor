@@ -34,6 +34,7 @@ export default async function EditProduct({
   return (
     <ProductForm
       product={product}
+      type={"edit"}
       action={submitUpdateProduct}
       categories={categories}
     />
