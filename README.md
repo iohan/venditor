@@ -2,8 +2,8 @@
 An efficient, scalable, and secure Product Information Management (PIM) system for e-commerce platforms. Built using modern technologies to handle product data, user authentication, and database interactions with high performance.
 
 ## Table of Contents
-[About the Project](#about-the-project)
-[Tech Stack](#tech-stack)
+- [About the Project](#about-the-project)
+- [Tech Stack](#tech-stack)
 
 ## About the Project
 The E-commerce PIM system is designed to simplify managing product data across multiple e-commerce platforms. With a focus on speed, scalability, and ease of use, it offers a centralized location for handling product information, inventory, categories, and more.
