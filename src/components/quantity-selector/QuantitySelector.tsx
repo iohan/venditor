@@ -10,6 +10,7 @@ const QuantitySelector = ({
 }) => {
   const [qty, setQty] = useState<number>(quantity);
   const [inputValue, setInputValue] = useState<string>(String(qty));
+  const [valueChanged, setValueChanged] = useState(false);
 
   const removeLeadingZeros = (value: string): string => {
     return value.replace(/^0+(?=\d)/, "");
@@ -23,6 +24,7 @@ const QuantitySelector = ({
       setQty(val);
       setInputValue(String(val));
     }
+    setValueChanged(true);
   };
 
   const handleOnChange = (evt: ChangeEvent<HTMLInputElement>) => {
@@ -49,8 +51,10 @@ const QuantitySelector = ({
   };
 
   useEffect(() => {
-    onChange(qty);
-  }, [qty, onChange]);
+    if (valueChanged) {
+      onChange(qty);
+    }
+  }, [qty, onChange, valueChanged]);
 
   return (
     <div className="inline-flex items-center border rounded-full">

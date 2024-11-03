@@ -4,13 +4,20 @@ import { devtools, persist } from "zustand/middleware";
 
 const initialState = {
   products: {},
-  totalProducts: 0,
 };
 
+export interface ProductStore {
+  id: number;
+  basePrice: number;
+  mediaUrl: string;
+  title: string;
+  sku: string;
+  amount: number;
+}
+
 interface CartStore {
-  products: Record<string, { id: number; amount: number }>;
-  totalProducts: number;
-  addProduct: (input: { id: number; amount: number }) => void;
+  products: Record<string, ProductStore>;
+  addProduct: (input: ProductStore) => void;
   clearCart: () => void;
 }
 
@@ -32,11 +39,6 @@ const useCartStore = create<CartStore>()(
               } else {
                 Object.assign(state.products, { [String(input.id)]: input });
               }
-
-              state.totalProducts = Object.values(state.products).reduce(
-                (total, product) => total + product.amount,
-                0,
-              );
             },
             undefined,
             "cart/addProduct",

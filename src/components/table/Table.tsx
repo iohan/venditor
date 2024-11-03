@@ -1,29 +1,19 @@
-import { useEffect, useState } from "react";
+import { cx } from "@/utils/cx";
 import { TableProps } from "./types";
 
-const Table = <T extends { id: number }>({
-  data,
-  fields,
-  onSelected,
-  onClick,
-}: TableProps<T>) => {
-  const [selected, setSelected] = useState<T[]>([]);
-
-  useEffect(() => {
-    if (selected.length > 0 && onSelected) {
-      onSelected(selected);
-    }
-  }, [selected, onSelected]);
-
+const Table = <T extends { id: number }>({ data, fields }: TableProps<T>) => {
   return (
     <table className="table-fixed w-full">
       <thead>
         <tr className="text-left bg-red-200">
-          <th className="w-5 rounded-l-xl"></th>
           {Object.values(fields).map((f, i) => (
             <th
               key={i}
-              className={`p-2 ${f.width} ${f.center && "text-center"} last:rounded-r-xl`}
+              className={cx(
+                "p-2 last:rounded-r-xl first:rounded-l-xl",
+                f.width && f.width,
+                f.center && "text-center",
+              )}
             >
               {f.title}
             </th>
@@ -34,18 +24,6 @@ const Table = <T extends { id: number }>({
         {data.map((item) => {
           return (
             <tr key={item.id} className="border-b-2">
-              <td className="p-2">
-                <input
-                  type="checkbox"
-                  onClick={(evt) =>
-                    evt.currentTarget.checked
-                      ? setSelected((prev) => [...prev, item])
-                      : setSelected((prev) =>
-                          prev.filter((s) => s.id !== item.id),
-                        )
-                  }
-                />
-              </td>
               {Object.keys(fields).map((field, i) => {
                 const Presentation = fields[field].presentation;
 
@@ -53,8 +31,7 @@ const Table = <T extends { id: number }>({
                 return (
                   <td
                     key={i}
-                    className={`p-2 ${fields[field].center && "text-center"} cursor-pointer`}
-                    onClick={() => onClick(item)}
+                    className={cx("p-2", fields[field].center && "text-center")}
                   >
                     {Presentation ? (
                       <Presentation data={item} />

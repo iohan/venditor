@@ -9,7 +9,11 @@ import useCartStore from "@/stores/cart-store";
 
 const Navigation = ({ pathname }: { pathname: string }) => {
   const { status } = useSession();
-  const totalProductsInCart = useCartStore((state) => state.totalProducts);
+  const productsInCart = useCartStore((state) => state.products);
+  const totalProductsInCart = Object.values(productsInCart).reduce(
+    (total, product) => total + product.amount,
+    0,
+  );
 
   const links = [
     {

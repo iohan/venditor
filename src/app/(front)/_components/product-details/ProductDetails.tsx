@@ -81,7 +81,14 @@ const ProductDetails = ({ product }: { product?: ProductType }) => {
               primary
               onClick={() =>
                 amount !== undefined &&
-                addProductToCart({ id: product.id, amount })
+                addProductToCart({
+                  id: product.id,
+                  amount,
+                  title: product.title,
+                  mediaUrl: product.mediaFiles[0].url,
+                  sku: product.sku,
+                  basePrice: product.basePrice ?? 0,
+                })
               }
             >
               Add to cart
