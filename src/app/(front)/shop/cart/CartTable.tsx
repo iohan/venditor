@@ -3,13 +3,11 @@ import Table from "@/components/table/Table";
 import { Fields } from "@/components/table/types";
 import { useRouter } from "next/navigation";
 import { CartProduct } from "./page";
+import QuantitySelector from "@/components/quantity-selector/QuantitySelector";
 
 const tableFields: Fields<CartProduct> = {
   title: {
     title: "Product",
-  },
-  amount: {
-    title: "Amount",
   },
   basePrice: {
     title: "Price",
@@ -17,6 +15,17 @@ const tableFields: Fields<CartProduct> = {
     center: true,
     presentation: ({ data }) => (
       <>{data.basePrice ? `${data.basePrice}kr` : "Gratis"}</>
+    ),
+  },
+  amount: {
+    title: "Amount",
+    width: "w-[200px]",
+    center: true,
+    presentation: ({ data }) => (
+      <QuantitySelector
+        quantity={data.amount}
+        onChange={(qty) => console.log(qty)}
+      />
     ),
   },
   total: {

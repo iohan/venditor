@@ -1,5 +1,5 @@
 import { Minus, Plus } from "lucide-react";
-import { ChangeEvent, useEffect, useState } from "react";
+import { ChangeEvent, MouseEvent, useEffect, useState } from "react";
 
 const QuantitySelector = ({
   quantity,
@@ -36,12 +36,14 @@ const QuantitySelector = ({
     changeQuantity(num);
   };
 
-  const subtract = () => {
+  const subtract = (evt: MouseEvent<HTMLDivElement>) => {
+    evt.stopPropagation();
     const num = qty > 0 ? qty - 1 : 0;
     changeQuantity(num);
   };
 
-  const add = () => {
+  const add = (evt: MouseEvent<HTMLDivElement>) => {
+    evt.stopPropagation();
     const num = qty + 1;
     changeQuantity(num);
   };
