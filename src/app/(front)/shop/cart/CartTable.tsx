@@ -21,7 +21,7 @@ const tableFields: Fields<CartProduct> = {
   },
   total: {
     title: "Total",
-    width: "w-16",
+    width: "w-24",
     center: true,
     presentation: ({ data }) => <>{(data.basePrice ?? 0) * data.amount}kr</>,
   },

@@ -2,13 +2,14 @@
 import useCartStore from "@/stores/cart-store";
 import { useEffect, useState } from "react";
 import { getProducts, ProductType } from "../../data-layer/product";
-import CartTable from "./CartTable";
+import Cart from "./Cart";
 
 export type CartProduct = ProductType & { amount: number };
 
-export default function Cart() {
+export default function CartRoute() {
   const [cart, setCart] = useState<CartProduct[]>([]);
   const productsInCart = useCartStore((state) => state.products);
+
   useEffect(() => {
     const fetchProducts = async () => {
       const products = await getProducts({
@@ -28,5 +29,6 @@ export default function Cart() {
       fetchProducts();
     }
   }, [productsInCart]);
-  return <CartTable products={cart} />;
+
+  return <Cart products={cart} />;
 }
