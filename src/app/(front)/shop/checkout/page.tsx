@@ -1,3 +1,5 @@
-export default function Checkout() {
-  return <>Checkout</>;
+import Checkout from "./Checkout";
+
+export default function CheckoutRoute() {
+  return <Checkout />;
 }
