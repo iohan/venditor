@@ -94,36 +94,32 @@ const ProductForm = ({
             <div className="font-semibold text-lg mb-2">Pricing and stock</div>
             <div className="flex gap-3 basis-full">
               <InputText
-                name="base_price"
                 label="Base pricing"
                 onChange={(val) =>
                   setProductData({ ...productData, basePrice: numberOnly(val) })
                 }
-                value={productData.basePrice ?? undefined}
+                value={productData.basePrice ?? ""}
                 placeholder="Base pricing"
               />
               <InputText
-                name="stock"
                 label="Stock"
                 placeholder="Stock"
                 onChange={(val) =>
                   setProductData({ ...productData, stock: numberOnly(val) })
                 }
-                value={productData.stock ?? undefined}
+                value={productData.stock ?? ""}
               />
             </div>
             <div className="flex gap-3 basis-full">
               <InputText
-                name="discount"
                 label="Discount"
                 onChange={(val) =>
                   setProductData({ ...productData, discount: numberOnly(val) })
                 }
-                value={productData.discount ?? undefined}
+                value={productData.discount ?? ""}
                 placeholder="Discount"
               />
               <InputText
-                name="sku"
                 onChange={(val) =>
                   setProductData({
                     ...productData,

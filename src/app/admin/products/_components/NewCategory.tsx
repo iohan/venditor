@@ -8,7 +8,6 @@ const NewCategory = ({ onAdd }: { onAdd: (category: string) => void }) => {
   return (
     <>
       <InputText
-        name="category_name"
         onChange={(val) => setNewCategory(String(val))}
         placeholder="Category name"
         value={newCategory}

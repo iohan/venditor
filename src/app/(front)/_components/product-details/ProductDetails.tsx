@@ -73,8 +73,7 @@ const ProductDetails = ({ product }: { product?: ProductType }) => {
           </div>
           <div className="flex flex-col gap-3 mt-5">
             <InputText
-              name="amount"
-              value={amount}
+              value={amount ?? 1}
               onChange={(value) => setAmount(numberOnly(value))}
             />
             <Button
