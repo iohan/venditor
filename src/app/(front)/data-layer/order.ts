@@ -1,5 +1,7 @@
 "use server";
 
+import prisma from "@/utils/prisma";
+
 export interface DeliveryInformation {
   name?: string;
   email?: string;
@@ -25,3 +27,73 @@ export interface OrderInput {
     price: number; // Calculated, basePrice * exchangerate
   }[];
 }
+
+export const addOrder = async (order: OrderInput) => {
+  if (!order.shopId) {
+    throw new Error("shopId is required");
+  }
+
+  // TODO: Add a better way to check forms
+  if (!order.delivery.email) {
+    throw new Error("email is required");
+  }
+  if (!order.delivery.name) {
+    throw new Error("name is required");
+  }
+  if (!order.shipping.title) {
+    throw new Error("shipping title is required");
+  }
+  if (!order.shipping.price) {
+    throw new Error("shipping price is required");
+  }
+
+  let customer = await prisma.customer.findUnique({
+    where: {
+      email: order.delivery.email,
+      ShopCustomer: { some: { shopId: order.shopId } },
+    },
+  });
+
+  if (!customer) {
+    customer = await prisma.customer.create({
+      data: {
+        email: order.delivery.email,
+        name: order.delivery.name,
+        mobileNumber: order.delivery.mobileNumber,
+        ShopCustomer: {
+          create: {
+            shop: {
+              connect: { id: order.shopId },
+            },
+          },
+        },
+      },
+    });
+  }
+
+  await prisma.order.create({
+    data: {
+      Shop: {
+        connect: { id: order.shopId },
+      },
+      Customer: {
+        connect: { id: customer.id },
+      },
+      OrderShipping: {
+        create: {
+          title: order.shipping.title,
+          price: order.shipping.price,
+        },
+      },
+      OrderProduct: {
+        create: order.products.map((product) => ({
+          productId: product.productId,
+          title: product.title,
+          amount: product.amount,
+          media: product.media,
+          price: product.price,
+        })),
+      },
+    },
+  });
+};

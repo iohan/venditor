@@ -95,6 +95,8 @@ model Order {
 model Customer {
   id           Int            @id @default(autoincrement())
   email        String         @unique
+  name         String
+  mobileNumber String?
   ShopCustomer ShopCustomer[]
   Order        Order[]
 }

@@ -1,10 +1,11 @@
 "use client";
 import InputText from "@/components/form/InputText";
-import { ReactNode, useEffect, useState } from "react";
+import { ReactNode, useState } from "react";
 import { ShippingAlternative } from "../../data-layer/shipping";
 import ShippingSelector from "./ShippingSelector";
 import Button from "@/components/button/Button";
 import {
+  addOrder,
   DeliveryInformation,
   OrderInput,
   Shipping,
@@ -36,7 +37,6 @@ const Checkout = ({
   shippingAlternatives: ShippingAlternative[];
 }) => {
   const products = useCartStore((state) => state.products);
-  const [order, setOrder] = useState<OrderInput>();
   const [deliveryData, setDeliveryData] = useState<DeliveryInformation>({
     name: undefined,
     email: undefined,
@@ -48,9 +48,9 @@ const Checkout = ({
     price: undefined,
   });
 
-  const handlePlaceOrder = () => {
+  const handlePlaceOrder = async () => {
     const prod = Object.values(products);
-    setOrder({
+    const order: OrderInput = {
       shopId: 1, // TODO: Change to dynamic shopId
       delivery: deliveryData,
       shipping: shippingData,
@@ -62,12 +62,10 @@ const Checkout = ({
         amount: p.amount,
         media: p.mediaUrl,
       })),
-    });
-  };
+    };
 
-  useEffect(() => {
-    console.log(order);
-  }, [order]);
+    await addOrder(order);
+  };
 
   return (
     <div className="container flex gap-5 mt-10">
