@@ -4,14 +4,20 @@ import { Fields } from "@/components/table/types";
 import ContainerBox from "../_components/ContainerBox";
 import { LayoutList } from "lucide-react";
 import { Order } from "../data-layer/order";
+import prettifyDateTime from "@/utils/prettify-date-time";
 
 const OrdersTable = ({ orders }: { orders: Order[] }) => {
   const tableFields: Fields<Order> = {
-    id: {
-      title: "Id",
+    orderNumber: {
+      title: <div className="pl-2">#</div>,
+      width: "w-10",
+      presentation: ({ data }) => (
+        <div className="pl-2">{data.orderNumber}</div>
+      ),
     },
     created: {
       title: "Created",
+      presentation: ({ data }) => <>{prettifyDateTime(data.created, true)}</>,
     },
   };
 

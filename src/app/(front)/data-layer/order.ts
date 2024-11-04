@@ -33,67 +33,77 @@ export const addOrder = async (order: OrderInput) => {
     throw new Error("shopId is required");
   }
 
-  // TODO: Add a better way to check forms
-  if (!order.delivery.email) {
-    throw new Error("email is required");
-  }
-  if (!order.delivery.name) {
-    throw new Error("name is required");
-  }
-  if (!order.shipping.title) {
-    throw new Error("shipping title is required");
-  }
-  if (!order.shipping.price) {
-    throw new Error("shipping price is required");
-  }
+  await prisma.$transaction(async (tx) => {
+    // TODO: Add a better way to check forms
+    if (!order.delivery.email) {
+      throw new Error("email is required");
+    }
+    if (!order.delivery.name) {
+      throw new Error("name is required");
+    }
+    if (!order.shipping.title) {
+      throw new Error("shipping title is required");
+    }
+    if (!order.shipping.price) {
+      throw new Error("shipping price is required");
+    }
 
-  let customer = await prisma.customer.findUnique({
-    where: {
-      email: order.delivery.email,
-      ShopCustomer: { some: { shopId: order.shopId } },
-    },
-  });
-
-  if (!customer) {
-    customer = await prisma.customer.create({
-      data: {
+    let customer = await tx.customer.findUnique({
+      where: {
         email: order.delivery.email,
-        name: order.delivery.name,
-        mobileNumber: order.delivery.mobileNumber,
-        ShopCustomer: {
-          create: {
-            shop: {
-              connect: { id: order.shopId },
+        ShopCustomer: { some: { shopId: order.shopId } },
+      },
+    });
+
+    if (!customer) {
+      customer = await tx.customer.create({
+        data: {
+          email: order.delivery.email,
+          name: order.delivery.name,
+          mobileNumber: order.delivery.mobileNumber,
+          ShopCustomer: {
+            create: {
+              shop: {
+                connect: { id: order.shopId },
+              },
             },
           },
         },
-      },
-    });
-  }
+      });
+    }
 
-  await prisma.order.create({
-    data: {
-      Shop: {
-        connect: { id: order.shopId },
-      },
-      Customer: {
-        connect: { id: customer.id },
-      },
-      OrderShipping: {
-        create: {
-          title: order.shipping.title,
-          price: order.shipping.price,
+    const counter = await tx.orderCounter.upsert({
+      where: { shopId: order.shopId },
+      create: { shopId: order.shopId, lastOrderNumber: 1 },
+      update: { lastOrderNumber: { increment: 1 } },
+      select: { lastOrderNumber: true },
+    });
+
+    await tx.order.create({
+      data: {
+        orderNumber: counter.lastOrderNumber,
+        Shop: {
+          connect: { id: order.shopId },
+        },
+        Customer: {
+          connect: { id: customer.id },
+        },
+        OrderShipping: {
+          create: {
+            title: order.shipping.title,
+            price: order.shipping.price,
+          },
+        },
+        OrderProduct: {
+          create: order.products.map((product) => ({
+            productId: product.productId,
+            title: product.title,
+            amount: product.amount,
+            media: product.media,
+            price: product.price,
+          })),
         },
       },
-      OrderProduct: {
-        create: order.products.map((product) => ({
-          productId: product.productId,
-          title: product.title,
-          amount: product.amount,
-          media: product.media,
-          price: product.price,
-        })),
-      },
-    },
+    });
   });
 };

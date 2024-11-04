@@ -6,6 +6,7 @@ import { redirect } from "next/navigation";
 
 export interface Order {
   id: number;
+  orderNumber: number;
   shopId: number;
   created: Date;
 }
@@ -33,5 +34,6 @@ export const getOrders = async ({
     id: order.id,
     shopId: order.shopId,
     created: order.createdAt,
+    orderNumber: order.orderNumber,
   }));
 };

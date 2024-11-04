@@ -81,6 +81,7 @@ model OrderShipping {
 
 model Order {
   id              Int            @id @default(autoincrement())
+  orderNumber     Int            @unique
   createdAt       DateTime       @default(now())
   updatedAt       DateTime       @updatedAt
   Shop            Shop           @relation(fields: [shopId], references: [id])
@@ -90,6 +91,12 @@ model Order {
   OrderProduct    OrderProduct[]
   OrderShipping   OrderShipping  @relation(fields: [orderShippingId], references: [id])
   orderShippingId Int            @unique
+}
+
+model OrderCounter {
+  Shop            Shop @relation(fields: [shopId], references: [id])
+  shopId          Int  @id
+  lastOrderNumber Int  @default(1)
 }
 
 model Customer {
@@ -128,6 +135,7 @@ model Shop {
   Order        Order[]
   ShopCustomer ShopCustomer[]
   Shipping     Shipping[]
+  OrderCounter OrderCounter[]
 }
 
 model Category {
