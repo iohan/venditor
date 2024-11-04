@@ -1,8 +1,10 @@
 "use client";
 import InputText from "@/components/form/InputText";
-import { ReactNode } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import { ShippingAlternative } from "../../data-layer/shipping";
 import ShippingSelector from "./ShippingSelector";
+import Button from "@/components/button/Button";
+import { OrderInput } from "../../data-layer/order";
 
 const Box = ({ label, children }: { label: string; children: ReactNode }) => {
   return (
@@ -28,6 +30,9 @@ const Checkout = ({
 }: {
   shippingAlternatives: ShippingAlternative[];
 }) => {
+  const [order, setOrder] = useState<OrderInput>();
+  const handlePlaceOrder = () => {};
+
   return (
     <div className="container flex gap-5 mt-10">
       <div className="basis-3/5 flex flex-col gap-5">
@@ -61,7 +66,9 @@ const Checkout = ({
 
         <div>Payments</div>
       </div>
-      <div className="basis-2/5">List products</div>
+      <div className="basis-2/5">
+        List products<Button onClick={handlePlaceOrder}>Place order</Button>
+      </div>
     </div>
   );
 };
