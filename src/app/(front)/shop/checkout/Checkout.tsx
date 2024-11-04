@@ -4,7 +4,12 @@ import { ReactNode, useEffect, useState } from "react";
 import { ShippingAlternative } from "../../data-layer/shipping";
 import ShippingSelector from "./ShippingSelector";
 import Button from "@/components/button/Button";
-import { OrderInput } from "../../data-layer/order";
+import {
+  DeliveryInformation,
+  OrderInput,
+  Shipping,
+} from "../../data-layer/order";
+import useCartStore from "@/stores/cart-store";
 
 const Box = ({ label, children }: { label: string; children: ReactNode }) => {
   return (
@@ -30,8 +35,39 @@ const Checkout = ({
 }: {
   shippingAlternatives: ShippingAlternative[];
 }) => {
+  const products = useCartStore((state) => state.products);
   const [order, setOrder] = useState<OrderInput>();
-  const handlePlaceOrder = () => {};
+  const [deliveryData, setDeliveryData] = useState<DeliveryInformation>({
+    name: undefined,
+    email: undefined,
+    mobileNumber: undefined,
+    country: undefined,
+  });
+  const [shippingData, setShippingData] = useState<Shipping>({
+    title: undefined,
+    price: undefined,
+  });
+
+  const handlePlaceOrder = () => {
+    const prod = Object.values(products);
+    setOrder({
+      shopId: 1, // TODO: Change to dynamic shopId
+      delivery: deliveryData,
+      shipping: shippingData,
+      products: prod.map((p) => ({
+        productId: p.id,
+        title: p.title,
+        sku: p.sku,
+        price: p.basePrice,
+        amount: p.amount,
+        media: p.mediaUrl,
+      })),
+    });
+  };
+
+  useEffect(() => {
+    console.log(order);
+  }, [order]);
 
   return (
     <div className="container flex gap-5 mt-10">
@@ -39,35 +75,64 @@ const Checkout = ({
         <Box label="Delivery information">
           <Row>
             <Col>
-              <InputText label="Name" placeholder="Your name" name="name" />
+              <InputText
+                label="Name"
+                placeholder="Your name"
+                value={deliveryData.name ?? ""}
+                onChange={(val) => {
+                  setDeliveryData({ ...deliveryData, name: val });
+                }}
+              />
             </Col>
             <Col>
               <InputText
                 label="Mobile Number"
                 placeholder="Your mobile number"
-                value={`+46 7`}
-                name="mobile"
+                value={deliveryData.mobileNumber ?? ""}
+                onChange={(val) => {
+                  setDeliveryData({ ...deliveryData, mobileNumber: val });
+                }}
               />
             </Col>
           </Row>
           <Row>
             <Col>
-              <InputText label="Email" placeholder="Your email" name="email" />
+              <InputText
+                label="Email"
+                placeholder="Your email"
+                value={deliveryData.email ?? ""}
+                onChange={(val) => {
+                  setDeliveryData({ ...deliveryData, email: val });
+                }}
+              />
             </Col>
             <Col>
-              <InputText label="Country" placeholder="County" name="country" />
+              <InputText
+                label="Country"
+                placeholder="County"
+                value={deliveryData.country ?? ""}
+                onChange={(val) => {
+                  setDeliveryData({ ...deliveryData, country: val });
+                }}
+              />
             </Col>
           </Row>
         </Box>
 
         <Box label="Shipping">
-          <ShippingSelector alternatives={shippingAlternatives} />
+          <ShippingSelector
+            setShippingData={setShippingData}
+            alternatives={shippingAlternatives}
+          />
         </Box>
 
         <div>Payments</div>
       </div>
       <div className="basis-2/5">
-        List products<Button onClick={handlePlaceOrder}>Place order</Button>
+        List products
+        <Button primary onClick={handlePlaceOrder}>
+          Place order
+        </Button>
       </div>
     </div>
   );

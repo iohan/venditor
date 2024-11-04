@@ -1,29 +1,27 @@
 import { cx } from "@/utils/cx";
 
 const InputText = ({
-  name,
   label,
   className,
   placeholder,
   value,
   onChange,
 }: {
-  name: string;
   label?: string;
   className?: string;
   placeholder?: string;
-  value?: string | number;
-  onChange?: (val: string | null) => void;
+  value: string | number;
+  onChange: (val: string | undefined) => void;
 }) => {
   return (
     <div className="flex flex-col gap-1 basis-full">
       <label className="font-medium">{label}</label>
       <input
         placeholder={placeholder}
-        name={name}
         type="text"
         onChange={(e) =>
-          onChange && onChange(e.target.value === "" ? null : e.target.value)
+          onChange &&
+          onChange(e.target.value === "" ? undefined : e.target.value)
         }
         value={value ?? ""}
         className={cx(
