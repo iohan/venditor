@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
-import { getCategories } from "@/data-layer/category";
+import { getCategories } from "@/app/admin/data-layer/category";
 import { auth } from "@/utils/auth";
-import { getProduct } from "@/data-layer/product";
+import { getProduct } from "@/app/admin/data-layer/product";
 import ProductForm from "../../_components/ProductForm";
 import { submitUpdateProduct } from "./actions";
 

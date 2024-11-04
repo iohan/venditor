@@ -1,11 +1,11 @@
 "use server";
 
-import { getSignedURL } from "@/data-layer/media";
-import { addProduct, ProductType } from "@/data-layer/product";
+import { getSignedURL } from "@/app/admin/data-layer/media";
+import { addProduct, ProductType } from "@/app/admin/data-layer/product";
 import { auth } from "@/utils/auth";
 import { computeFileChecksum } from "@/utils/compute-file-checksum";
 import { redirect } from "next/navigation";
-import { addCategories } from "@/data-layer/category";
+import { addCategories } from "@/app/admin/data-layer/category";
 
 export const submitNewProduct = async (
   product: ProductType,

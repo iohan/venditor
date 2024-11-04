@@ -2,7 +2,7 @@ import InputText from "@/components/form/InputText";
 import ContainerBox from "../../_components/ContainerBox";
 import TextArea from "@/components/form/TextArea";
 import { generateSlug } from "@/utils/slug";
-import { ProductType } from "@/data-layer/product";
+import { ProductType } from "@/app/admin/data-layer/product";
 
 const GeneralInfo = ({
   product,
@@ -16,7 +16,6 @@ const GeneralInfo = ({
       <div className="font-semibold text-lg mb-2">General Information</div>
       <InputText
         label="Product name"
-        name="name"
         placeholder="Product name"
         value={`${product.title}`}
         onChange={(val) =>

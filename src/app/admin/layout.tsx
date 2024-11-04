@@ -1,6 +1,6 @@
 "use client";
 
-import AdminSideNav from "./_components/admin-side-nav/AdminSideNav";
+import Navigation from "./_components/navigation/Navigation";
 
 export default function RootLayout({
   children,
@@ -9,7 +9,7 @@ export default function RootLayout({
 }>) {
   return (
     <div className="flex h-screen">
-      <AdminSideNav />
+      <Navigation />
       <div className="p-10 w-full">{children}</div>
     </div>
   );

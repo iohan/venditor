@@ -1,15 +1,15 @@
 "use server";
 
-import { getSignedURL, removeMediaFiles } from "@/data-layer/media";
+import { getSignedURL, removeMediaFiles } from "@/app/admin/data-layer/media";
 import {
   getProductMediaFiles,
   ProductType,
   updateProduct,
-} from "@/data-layer/product";
+} from "@/app/admin/data-layer/product";
 import { auth } from "@/utils/auth";
 import { computeFileChecksum } from "@/utils/compute-file-checksum";
 import { redirect } from "next/navigation";
-import { addCategories } from "@/data-layer/category";
+import { addCategories } from "@/app/admin/data-layer/category";
 
 export const submitUpdateProduct = async (
   product: ProductType,

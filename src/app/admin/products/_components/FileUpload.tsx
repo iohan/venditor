@@ -1,7 +1,7 @@
 import { ChangeEvent, useState } from "react";
 import ContainerBox from "../../_components/ContainerBox";
 import FileInput from "./FileInput";
-import { ProductType } from "@/data-layer/product";
+import { ProductType } from "@/app/admin/data-layer/product";
 
 const FileUpload = ({
   product,

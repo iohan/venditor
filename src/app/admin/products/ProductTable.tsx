@@ -6,7 +6,7 @@ import ContainerBox from "../_components/ContainerBox";
 import { Check, LayoutList, Trash2 } from "lucide-react";
 import Button from "@/components/button/Button";
 import { useEffect, useState } from "react";
-import { deleteProducts } from "@/data-layer/product";
+import { deleteProducts } from "@/app/admin/data-layer/product";
 import Link from "next/link";
 
 const ProductTable = ({ products }: { products: Product[] }) => {

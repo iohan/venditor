@@ -9,7 +9,7 @@ import SelectCategory from "./SelectCategory";
 import { generateSlug } from "@/utils/slug";
 import { numberOnly } from "@/utils/number-only";
 import FileUpload from "./FileUpload";
-import { ProductType } from "@/data-layer/product";
+import { ProductType } from "@/app/admin/data-layer/product";
 import Header from "./Header";
 
 const initialProduct: ProductType = {

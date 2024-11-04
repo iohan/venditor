@@ -3,7 +3,7 @@ import ContainerBox from "../../_components/ContainerBox";
 import { SquareX } from "lucide-react";
 import NewCategory from "./NewCategory";
 import { Category as CategoryType } from "@prisma/client";
-import { ProductType } from "@/data-layer/product";
+import { ProductType } from "@/app/admin/data-layer/product";
 
 interface CategoryProps {
   categories: CategoryType[];

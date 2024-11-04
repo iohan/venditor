@@ -1,7 +1,7 @@
 import { auth } from "@/utils/auth";
 import { redirect } from "next/navigation";
 import ProductTable from "./ProductTable";
-import { getProducts } from "@/data-layer/product";
+import { getProducts } from "@/app/admin/data-layer/product";
 
 export default async function Products() {
   const session = await auth();
