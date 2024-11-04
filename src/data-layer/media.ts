@@ -19,14 +19,7 @@ const s3 = new S3Client({
   },
 });
 
-const acceptedTypes = [
-  "image/jpeg",
-  "image/png",
-  "image/webp",
-  "image/gif",
-  "video/mp4",
-  "video/webm",
-];
+const acceptedTypes = ["image/jpeg", "image/png", "image/webp"];
 
 const maxFileSize = 1024 * 1024 * 10; // 10MB
 

@@ -33,8 +33,8 @@ const FileInput = ({
       <input
         type="file"
         ref={fileInputRef}
+        accept=".jpeg, .jpg, .png, .webp"
         onChange={(event) => handleImageOnChange(event, index)}
-        multiple
         style={{ display: "none" }}
       />
       <div
