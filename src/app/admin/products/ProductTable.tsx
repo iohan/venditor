@@ -1,112 +1,179 @@
 "use client";
-import Table from "@/components/table/Table";
-import { Fields } from "@/components/table/types";
-import { Product } from "@prisma/client";
-import ContainerBox from "../_components/ContainerBox";
-import { Check, LayoutList, Trash2 } from "lucide-react";
-import Button from "@/components/button/Button";
-import { useEffect, useState } from "react";
-import { deleteProducts } from "@/app/admin/data-layer/product";
-import Link from "next/link";
 
-const ProductTable = ({ products }: { products: Product[] }) => {
-  const [selected, setSelected] = useState<{ id: number; checked: boolean }[]>(
-    [],
-  );
+import {
+  ColumnDef,
+  flexRender,
+  getCoreRowModel,
+  ColumnFiltersState,
+  getFilteredRowModel,
+  useReactTable,
+  SortingState,
+  getSortedRowModel,
+  getPaginationRowModel,
+  VisibilityState,
+} from "@tanstack/react-table";
 
-  const toggleAll = (checked: boolean) => {
-    setSelected((prev) => prev.map((item) => ({ ...item, checked })));
-  };
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { useState } from "react";
 
-  const toggleSelection = (id: number, checked: boolean) => {
-    setSelected((prev) =>
-      prev.map((item) => (item.id === id ? { ...item, checked } : item)),
-    );
-  };
+interface DataTableProps<TData, TValue> {
+  columns: ColumnDef<TData, TValue>[];
+  data: TData[];
+}
 
-  const handleDeleteProducts = async () => {
-    await deleteProducts({
-      shopId: 1,
-      productIds: selected.map((s) => s.id),
-    });
-  };
+export function ProductTable<TData, TValue>({
+  columns,
+  data,
+}: DataTableProps<TData, TValue>) {
+  const [sorting, setSorting] = useState<SortingState>([]);
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
+  const [rowSelection, setRowSelection] = useState({});
 
-  const tableFields: Fields<Product> = {
-    selection: {
-      title: (
-        <div className="pl-2">
-          <input
-            type="checkbox"
-            checked={selected.length > 0 && selected.every((s) => s.checked)}
-            onChange={(evt) => toggleAll(evt.currentTarget.checked)}
-          />
-        </div>
-      ),
-      width: "w-10",
-      presentation: ({ data }) => {
-        const checked = selected.find((s) => s.id === data.id)?.checked;
-        return (
-          <div className="pl-2">
-            <input
-              type="checkbox"
-              checked={checked}
-              onChange={() => toggleSelection(data.id, !checked)}
-            />
-          </div>
-        );
-      },
+  const table = useReactTable({
+    data,
+    columns,
+    getCoreRowModel: getCoreRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    onSortingChange: setSorting,
+    getSortedRowModel: getSortedRowModel(),
+    onColumnFiltersChange: setColumnFilters,
+    getFilteredRowModel: getFilteredRowModel(),
+    onColumnVisibilityChange: setColumnVisibility,
+    onRowSelectionChange: setRowSelection,
+    state: {
+      sorting,
+      columnFilters,
+      columnVisibility,
+      rowSelection,
     },
-    title: {
-      title: "Product",
-      presentation: ({ data }) => (
-        <Link href={`products/edit-product/${data.id}`}>{data.title}</Link>
-      ),
-    },
-    draft: {
-      title: "SKU",
-    },
-    shopId: {
-      title: "Price",
-      width: "w-16",
-      center: true,
-    },
-    total: {
-      title: "Total",
-      width: "w-16",
-      center: true,
-      presentation: ({ data }) => <>{data.shopId * 10}</>,
-    },
-  };
-
-  useEffect(() => {
-    if (products) {
-      setSelected(products.map((p) => ({ id: p.id, checked: false })));
-    }
-  }, [products]);
+  });
 
   return (
-    <div className="flex flex-col">
-      <div className="flex justify-between mb-5">
-        <div className="flex gap-2 items-center">
-          <LayoutList size={20} className="text-amber-700/75" />
-          <div className="text-xl font-semibold">Products</div>
-        </div>
-        <div className="flex gap-3">
-          {selected.some((s) => s.checked) && (
-            <Button primary icon={Trash2} onClick={handleDeleteProducts}>
-              Delete
+    <div>
+      <div className="flex items-center py-4">
+        <Input
+          placeholder="Filter products..."
+          value={(table.getColumn("title")?.getFilterValue() as string) ?? ""}
+          onChange={(event) =>
+            table.getColumn("title")?.setFilterValue(event.target.value)
+          }
+          className="max-w-sm"
+        />
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline" className="ml-auto">
+              Columns
             </Button>
-          )}
-          <Button primary icon={Check} href={"products/add-product"}>
-            Add Product
-          </Button>
-        </div>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            {table
+              .getAllColumns()
+              .filter((column) => column.getCanHide())
+              .map((column) => {
+                return (
+                  <DropdownMenuCheckboxItem
+                    key={column.id}
+                    className="capitalize"
+                    checked={column.getIsVisible()}
+                    onCheckedChange={(value) =>
+                      column.toggleVisibility(!!value)
+                    }
+                  >
+                    {column.id}
+                  </DropdownMenuCheckboxItem>
+                );
+              })}
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
-      <ContainerBox>
-        <Table data={products} fields={tableFields} />
-      </ContainerBox>
+      <div className="rounded-md border">
+        <Table>
+          <TableHeader>
+            {table.getHeaderGroups().map((headerGroup) => (
+              <TableRow key={headerGroup.id}>
+                {headerGroup.headers.map((header) => {
+                  return (
+                    <TableHead key={header.id}>
+                      {header.isPlaceholder
+                        ? null
+                        : flexRender(
+                            header.column.columnDef.header,
+                            header.getContext(),
+                          )}
+                    </TableHead>
+                  );
+                })}
+              </TableRow>
+            ))}
+          </TableHeader>
+          <TableBody>
+            {table.getRowModel().rows?.length ? (
+              table.getRowModel().rows.map((row) => (
+                <TableRow
+                  key={row.id}
+                  data-state={row.getIsSelected() && "selected"}
+                >
+                  {row.getVisibleCells().map((cell) => (
+                    <TableCell key={cell.id}>
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext(),
+                      )}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell
+                  colSpan={columns.length}
+                  className="h-24 text-center"
+                >
+                  No results.
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </div>
+      <div className="flex items-center justify-end space-x-2 py-4">
+        <div className="flex-1 text-sm text-muted-foreground">
+          {table.getFilteredSelectedRowModel().rows.length} of{" "}
+          {table.getFilteredRowModel().rows.length} row(s) selected.
+        </div>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => table.previousPage()}
+          disabled={!table.getCanPreviousPage()}
+        >
+          Previous
+        </Button>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => table.nextPage()}
+          disabled={!table.getCanNextPage()}
+        >
+          Next
+        </Button>
+      </div>
     </div>
   );
-};
-
-export default ProductTable;
+}
