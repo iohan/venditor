@@ -17,25 +17,27 @@ import {
 } from "@/components/ui/sidebar";
 import { sidebarData } from "./static";
 import { User } from "next-auth";
+import { ShopInfo } from "../../data-layer/shop";
 
 interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
   user: User;
+  shop: ShopInfo;
 }
 
-export function AppSidebar({ user, ...props }: AppSidebarProps) {
+export function AppSidebar({ user, shop, ...props }: AppSidebarProps) {
   return (
     <Sidebar variant="inset" {...props}>
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild>
-              <a href="#">
+              <a href="/admin/dashboard">
                 <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
                   <Droplet className="size-4" />
                 </div>
                 <div className="grid flex-1 text-left text-sm leading-tight">
                   <span className="truncate font-semibold">.venditor</span>
-                  <span className="truncate text-xs">Ekoporten.se</span>
+                  <span className="truncate text-xs">{shop.title}</span>
                 </div>
               </a>
             </SidebarMenuButton>
@@ -47,9 +49,11 @@ export function AppSidebar({ user, ...props }: AppSidebarProps) {
         <NavGroup items={sidebarData.store} groupLabel="Store" />
         <NavHelper items={sidebarData.helper} className="mt-auto" />
       </SidebarContent>
-      <SidebarFooter>
-        <NavUser user={user} />
-      </SidebarFooter>
+      {user && (
+        <SidebarFooter>
+          <NavUser user={user} />
+        </SidebarFooter>
+      )}
     </Sidebar>
   );
 }

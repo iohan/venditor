@@ -8,5 +8,6 @@ export default async function Admin() {
   if (!session) {
     redirect("/api/auth/signin");
   }
+
   return <Dashboard />;
 }

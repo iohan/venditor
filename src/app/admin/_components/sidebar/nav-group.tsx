@@ -43,7 +43,7 @@ export function NavGroup({
           <Collapsible key={item.title} asChild defaultOpen={item.isActive}>
             <SidebarMenuItem>
               <SidebarMenuButton asChild tooltip={item.title}>
-                <a href={item.url}>
+                <a href={"/admin" + item.url}>
                   <item.icon className="text-sidebar-icon" />
                   <span>{item.title}</span>
                 </a>
@@ -61,7 +61,7 @@ export function NavGroup({
                       {item.items?.map((subItem) => (
                         <SidebarMenuSubItem key={subItem.title}>
                           <SidebarMenuSubButton asChild>
-                            <a href={subItem.url}>
+                            <a href={"/admin" + subItem.url}>
                               <span>{subItem.title}</span>
                             </a>
                           </SidebarMenuSubButton>

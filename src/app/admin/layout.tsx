@@ -14,15 +14,21 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 import { auth } from "@/utils/auth";
+import { ReactNode } from "react";
+import { getShopInfo } from "./data-layer/shop";
+import { redirect } from "next/navigation";
 
-export default async function Page() {
+export default async function Page({ children }: { children: ReactNode }) {
   const session = await auth();
+  if (!session?.user) {
+    redirect("/api/auth/signin");
+  }
 
-  console.log(session);
+  const shop = await getShopInfo({ shopId: 1 });
 
   return (
     <SidebarProvider>
-      <AppSidebar user={session.user} />
+      <AppSidebar user={session.user} shop={shop} />
       <SidebarInset>
         <header className="flex h-16 shrink-0 items-center gap-2">
           <div className="flex items-center gap-2 px-4">
@@ -31,26 +37,17 @@ export default async function Page() {
             <Breadcrumb>
               <BreadcrumbList>
                 <BreadcrumbItem className="hidden md:block">
-                  <BreadcrumbLink href="#">
-                    Building Your Application
-                  </BreadcrumbLink>
+                  <BreadcrumbLink href="#">Dashboard</BreadcrumbLink>
                 </BreadcrumbItem>
                 <BreadcrumbSeparator className="hidden md:block" />
                 <BreadcrumbItem>
-                  <BreadcrumbPage>Data Fetching</BreadcrumbPage>
+                  <BreadcrumbPage>Products</BreadcrumbPage>
                 </BreadcrumbItem>
               </BreadcrumbList>
             </Breadcrumb>
           </div>
         </header>
-        <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
-          <div className="grid auto-rows-min gap-4 md:grid-cols-3">
-            <div className="aspect-video rounded-xl bg-gray-100/50 dark:bg-gray-800/50" />
-            <div className="aspect-video rounded-xl bg-gray-100/50 dark:bg-gray-800/50" />
-            <div className="aspect-video rounded-xl bg-gray-100/50 dark:bg-gray-800/50" />
-          </div>
-          <div className="min-h-[100vh] flex-1 rounded-xl bg-gray-100/50 md:min-h-min dark:bg-gray-800/50" />
-        </div>
+        <div className="flex flex-1 flex-col gap-4 p-5 pt-0">{children}</div>
       </SidebarInset>
     </SidebarProvider>
   );

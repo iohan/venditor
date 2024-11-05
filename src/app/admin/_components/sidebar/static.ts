@@ -9,15 +9,10 @@ import {
 } from "lucide-react";
 
 export const sidebarData = {
-  user: {
-    name: "shadcn",
-    email: "m@example.com",
-    avatar: "/avatars/shadcn.jpg",
-  },
   management: [
     {
       title: "Products",
-      url: "#",
+      url: "/products",
       icon: ScanBarcode,
       isActive: true,
       items: [
@@ -29,7 +24,7 @@ export const sidebarData = {
     },
     {
       title: "Orders",
-      url: "#",
+      url: "/orders",
       icon: ListChecks,
       items: [
         {
