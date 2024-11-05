@@ -37,6 +37,9 @@ const config: Config = {
           icon: "hsl(var(--sidebar-icon))",
           ring: "hsl(var(--sidebar-ring))",
         },
+        table: {
+          primary: "hsl(var(--table-primary))",
+        },
       },
       fontFamily: {
         dmSans: ["var(--font-dm-sans)"],

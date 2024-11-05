@@ -45,6 +45,7 @@ export const columns: ColumnDef<Product>[] = [
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          className="hover:bg-transparent hover:underline"
         >
           Product info
           <ArrowUpDown className="ml-2 h-4 w-4" />
