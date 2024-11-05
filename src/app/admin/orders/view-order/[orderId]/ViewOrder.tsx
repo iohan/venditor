@@ -1,4 +1,3 @@
-import PaymentLabel from "@/app/admin/_components/label/PaymentLabel";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ChevronDown, ChevronLeft, ChevronRight, Pencil } from "lucide-react";

@@ -6,15 +6,9 @@ import { LayoutList } from "lucide-react";
 import { Order } from "../data-layer/order";
 import prettifyDateTime from "@/utils/prettify-date-time";
 import Link from "next/link";
-import PaymentLabel from "../_components/label/PaymentLabel";
-import OrderStatusLabel from "../_components/label/OrderStatusLabel";
+import { Badge } from "@/components/ui/badge";
 
 const OrdersTable = ({ orders }: { orders: Order[] }) => {
-  const getRandomStatus = (statuses: string[]): string => {
-    const randomIndex = Math.floor(Math.random() * statuses.length);
-    return statuses[randomIndex];
-  };
-
   const tableFields: Fields<Order> = {
     selection: {
       title: (
@@ -52,11 +46,7 @@ const OrdersTable = ({ orders }: { orders: Order[] }) => {
     },
     payment: {
       title: "Payment",
-      presentation: () => (
-        <PaymentLabel
-          type={getRandomStatus(["pending", "success", "declined"])}
-        />
-      ),
+      presentation: () => <Badge variant={"completed"}>Success</Badge>,
     },
     totalPrice: {
       title: "Total",
@@ -72,11 +62,7 @@ const OrdersTable = ({ orders }: { orders: Order[] }) => {
     },
     orderStatus: {
       title: "Order status",
-      presentation: () => (
-        <OrderStatusLabel
-          type={getRandomStatus(["canceled", "completed", "in-process"])}
-        />
-      ),
+      presentation: () => <Badge variant={"pending"}>In process</Badge>,
     },
   };
 
