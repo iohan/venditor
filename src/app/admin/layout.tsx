@@ -13,11 +13,16 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
+import { auth } from "@/utils/auth";
 
-export default function Page() {
+export default async function Page() {
+  const session = await auth();
+
+  console.log(session);
+
   return (
     <SidebarProvider>
-      <AppSidebar />
+      <AppSidebar user={session.user} />
       <SidebarInset>
         <header className="flex h-16 shrink-0 items-center gap-2">
           <div className="flex items-center gap-2 px-4">
