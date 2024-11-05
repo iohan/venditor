@@ -8,7 +8,7 @@ const Label = ({ name, color }: { name: string; color: string }) => {
         className={`w-1 h-1 rounded-full`}
         style={{ backgroundColor: color }}
       ></div>
-      <div>{name}</div>
+      <div className="font-semibold">{name}</div>
     </div>
   );
 };

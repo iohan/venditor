@@ -7,15 +7,28 @@ import { Order } from "../data-layer/order";
 import prettifyDateTime from "@/utils/prettify-date-time";
 import Link from "next/link";
 import PaymentLabel from "../_components/label/PaymentLabel";
+import OrderStatusLabel from "../_components/label/OrderStatusLabel";
 
 const OrdersTable = ({ orders }: { orders: Order[] }) => {
-  const getRandomStatus = (): "pending" | "success" | "declined" => {
-    const statuses = ["pending", "success", "declined"] as const;
+  const getRandomStatus = (statuses: string[]): string => {
     const randomIndex = Math.floor(Math.random() * statuses.length);
     return statuses[randomIndex];
   };
 
   const tableFields: Fields<Order> = {
+    selection: {
+      title: (
+        <div className="pl-2">
+          <input type="checkbox" />
+        </div>
+      ),
+      width: "w-10",
+      presentation: () => (
+        <div className="pl-2">
+          <input type="checkbox" />
+        </div>
+      ),
+    },
     orderNumber: {
       title: <div className="pl-2">Order</div>,
       width: "w-20",
@@ -26,7 +39,7 @@ const OrdersTable = ({ orders }: { orders: Order[] }) => {
     created: {
       title: "Date",
       presentation: ({ data }) => (
-        <Link href={`/admin/orders/edit-order/${data.id}`}>
+        <Link href={`/admin/orders/view-order/${data.id}`}>
           {prettifyDateTime(data.created, {
             showTime: false,
             showCurrentYear: true,
@@ -39,7 +52,31 @@ const OrdersTable = ({ orders }: { orders: Order[] }) => {
     },
     payment: {
       title: "Payment",
-      presentation: () => <PaymentLabel type={getRandomStatus()} />,
+      presentation: () => (
+        <PaymentLabel
+          type={getRandomStatus(["pending", "success", "declined"])}
+        />
+      ),
+    },
+    totalPrice: {
+      title: "Total",
+      presentation: ({ data }) => <>{data.totalPrice}kr</>,
+    },
+    itemCount: {
+      title: "Items",
+      presentation: ({ data }) => (
+        <>
+          {data.itemCount} item{data.itemCount > 1 && "s"}
+        </>
+      ),
+    },
+    orderStatus: {
+      title: "Order status",
+      presentation: () => (
+        <OrderStatusLabel
+          type={getRandomStatus(["canceled", "completed", "in-process"])}
+        />
+      ),
     },
   };
 

@@ -10,6 +10,8 @@ export interface Order {
   shopId: number;
   created: Date;
   customer: string;
+  totalPrice: number;
+  itemCount: number;
 }
 
 export const getOrders = async (input: {
@@ -37,6 +39,13 @@ export const getOrders = async (input: {
       shopId: true,
       createdAt: true,
       orderNumber: true,
+      OrderProduct: {
+        select: {
+          amount: true,
+          price: true,
+          orderId: true,
+        },
+      },
       Customer: {
         select: {
           name: true,
@@ -52,5 +61,13 @@ export const getOrders = async (input: {
     created: order.createdAt,
     orderNumber: order.orderNumber,
     customer: order.Customer.name ? order.Customer.name : order.Customer.email,
+    itemCount: order.OrderProduct.reduce(
+      (sum, product) => sum + product.amount,
+      0,
+    ),
+    totalPrice: order.OrderProduct.reduce(
+      (sum, product) => sum + product.price * product.amount,
+      0,
+    ),
   }));
 };
