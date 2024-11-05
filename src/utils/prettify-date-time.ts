@@ -1,13 +1,23 @@
 import { format } from "date-fns";
 
-const prettifyDateTime = (date: Date, omitCurrentYear?: true): string => {
+const prettifyDateTime = (
+  date: Date,
+  {
+    showCurrentYear = false,
+    showTime = false,
+  }: { showCurrentYear?: boolean; showTime?: boolean },
+): string => {
   const currentYear = new Date().getFullYear();
   const dateYear = date.getFullYear();
 
   const formatString =
-    dateYear === currentYear && omitCurrentYear
-      ? "MMM do HH:mm"
-      : "MMM do yyyy HH:mm";
+    dateYear === currentYear && !showCurrentYear
+      ? showTime
+        ? "d MMM, HH:mm"
+        : "d MMM"
+      : showTime
+        ? "d MMM, yyyy HH:mm"
+        : "d MMM, yyyy";
 
   return format(date, formatString);
 };

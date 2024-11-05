@@ -29,6 +29,7 @@
     "react": "^18",
     "react-dom": "^18",
     "tailwind-merge": "^2.5.4",
+    "ts-pattern": "^5.5.0",
     "ws": "^8.18.0",
     "zustand": "^5.0.1"
   },
