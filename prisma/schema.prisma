@@ -96,7 +96,7 @@ model Order {
 model OrderCounter {
   Shop            Shop @relation(fields: [shopId], references: [id])
   shopId          Int  @id
-  lastOrderNumber Int  @default(1)
+  lastOrderNumber Int  @default(1001)
 }
 
 model Customer {

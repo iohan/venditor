@@ -74,7 +74,7 @@ export const addOrder = async (order: OrderInput) => {
 
     const counter = await tx.orderCounter.upsert({
       where: { shopId: order.shopId },
-      create: { shopId: order.shopId, lastOrderNumber: 1 },
+      create: { shopId: order.shopId },
       update: { lastOrderNumber: { increment: 1 } },
       select: { lastOrderNumber: true },
     });
