@@ -1,4 +1,4 @@
-import Button from "@/components/button/Button";
+import { Button } from "@/components/ui/button";
 import { BookDashed, Check, LayoutList } from "lucide-react";
 
 const Header = ({
@@ -20,25 +20,19 @@ const Header = ({
       </div>
       <div className="flex gap-3">
         {type === "add" ? (
-          <Button
-            secondary
-            icon={BookDashed}
-            onClick={() => console.log("Save draft")}
-          >
+          <Button variant="secondary" onClick={() => console.log("Save draft")}>
+            <BookDashed />
             Save Draft
           </Button>
         ) : (
-          <Button
-            secondary
-            icon={BookDashed}
-            onClick={() => console.log("Save draft")}
-          >
+          <Button variant="secondary" onClick={() => console.log("Save draft")}>
+            <BookDashed />
             {draft ? "Draft" : "Published"}
           </Button>
         )}
         {changesMade && (
-          <Button primary icon={Check} type="submit">
-            {type === "add" ? "Add Product" : "Update Product"}
+          <Button type="submit">
+            {type === "add" ? "Add Product" : "Update Product"} <Check />
           </Button>
         )}
       </div>

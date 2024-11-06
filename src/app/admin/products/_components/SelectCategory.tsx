@@ -4,6 +4,13 @@ import { SquareX } from "lucide-react";
 import NewCategory from "./NewCategory";
 import { Category as CategoryType } from "@prisma/client";
 import { ProductType } from "@/app/admin/data-layer/product";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface CategoryProps {
   categories: CategoryType[];
@@ -53,6 +60,20 @@ const Category = ({ categories, product, setProduct }: CategoryProps) => {
   return (
     <ContainerBox>
       <div className="font-semibold text-lg">Category</div>
+      <Select>
+        <SelectTrigger className="bg-white">
+          <SelectValue placeholder="Select a category" />
+        </SelectTrigger>
+        <SelectContent>
+          {categories
+            .filter((c) => !selectedCategories?.some((s) => s.id === c.id))
+            .map((category) => (
+              <SelectItem key={category.id} value={String(category.id)}>
+                {category.title}
+              </SelectItem>
+            ))}
+        </SelectContent>
+      </Select>
       <Dropdown
         options={categories
           .filter((c) => !selectedCategories?.some((s) => s.id === c.id))

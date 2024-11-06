@@ -30,6 +30,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
+import Link from "next/link";
+import { Check } from "lucide-react";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -66,7 +68,7 @@ export function ProductTable<TData, TValue>({
 
   return (
     <div>
-      <div className="flex items-center py-4">
+      <div className="flex items-center py-4 gap-4">
         <Input
           placeholder="Filter products..."
           value={(table.getColumn("title")?.getFilterValue() as string) ?? ""}
@@ -101,6 +103,11 @@ export function ProductTable<TData, TValue>({
               })}
           </DropdownMenuContent>
         </DropdownMenu>
+        <Button asChild>
+          <Link href="products/add-product">
+            Add new product <Check />
+          </Link>
+        </Button>
       </div>
       <div className="rounded-md border overflow-hidden">
         <Table>
