@@ -14,13 +14,11 @@ const ContextActions = ({ productId }: { productId: number }) => {
   const { showAlert } = useAlertDialog();
 
   const deleteProduct = () => {
-    console.log(productId);
     showAlert({
       title: "Are you sure you want to delete this product?",
       description:
         "This action cannot be undone. This will permanently delete your product and remove your data from the database.",
       onConfirm: async () => {
-        console.log("DELETE");
         await deleteProducts({
           shopId: 1,
           productIds: [productId],

@@ -8,6 +8,7 @@ import {
   getFilteredRowModel,
   useReactTable,
   SortingState,
+  RowSelectionState,
   getSortedRowModel,
   getPaginationRowModel,
   VisibilityState,
@@ -31,7 +32,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import Link from "next/link";
-import { Check } from "lucide-react";
+import { Check, Trash2 } from "lucide-react";
+import { Product } from "@prisma/client";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -45,7 +47,7 @@ export function ProductTable<TData, TValue>({
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
-  const [rowSelection, setRowSelection] = useState({});
+  const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
 
   const table = useReactTable({
     data,
@@ -66,9 +68,14 @@ export function ProductTable<TData, TValue>({
     },
   });
 
+  const deleteSelectedProducts = () => {
+    const selectedRow = table.getSelectedRowModel().rows;
+    console.log(selectedRow[0].getValue("product"));
+  };
+
   return (
     <div>
-      <div className="flex items-center py-4 gap-4">
+      <div className="flex items-center justify-between py-4 gap-4">
         <Input
           placeholder="Filter products..."
           value={(table.getColumn("title")?.getFilterValue() as string) ?? ""}
@@ -77,37 +84,48 @@ export function ProductTable<TData, TValue>({
           }
           className="max-w-sm"
         />
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="ml-auto">
-              Columns
+        <div className="flex gap-2 items-center">
+          {table.getFilteredSelectedRowModel().rows.length > 0 && (
+            <Button
+              size="icon"
+              className="mr-4"
+              onClick={deleteSelectedProducts}
+            >
+              <Trash2 />
             </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            {table
-              .getAllColumns()
-              .filter((column) => column.getCanHide())
-              .map((column) => {
-                return (
-                  <DropdownMenuCheckboxItem
-                    key={column.id}
-                    className="capitalize"
-                    checked={column.getIsVisible()}
-                    onCheckedChange={(value) =>
-                      column.toggleVisibility(!!value)
-                    }
-                  >
-                    {column.id}
-                  </DropdownMenuCheckboxItem>
-                );
-              })}
-          </DropdownMenuContent>
-        </DropdownMenu>
-        <Button asChild>
-          <Link href="products/add-product">
-            Add new product <Check />
-          </Link>
-        </Button>
+          )}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" className="ml-auto">
+                Columns
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              {table
+                .getAllColumns()
+                .filter((column) => column.getCanHide())
+                .map((column) => {
+                  return (
+                    <DropdownMenuCheckboxItem
+                      key={column.id}
+                      className="capitalize"
+                      checked={column.getIsVisible()}
+                      onCheckedChange={(value) =>
+                        column.toggleVisibility(!!value)
+                      }
+                    >
+                      {column.id}
+                    </DropdownMenuCheckboxItem>
+                  );
+                })}
+            </DropdownMenuContent>
+          </DropdownMenu>
+          <Button asChild>
+            <Link href="products/add-product">
+              Add new product <Check />
+            </Link>
+          </Button>
+        </div>
       </div>
       <div className="rounded-md border overflow-hidden">
         <Table>
