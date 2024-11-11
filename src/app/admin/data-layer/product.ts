@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import prisma from "@/utils/prisma";
 import { removeMediaFiles } from "./media";
 import { removeCategoryConnections } from "./category";
+import { revalidatePath } from "next/cache";
 
 export interface ProductType {
   id?: number;
@@ -257,9 +258,11 @@ export const addProduct = async (data: AddProductInput) => {
 export const deleteProducts = async ({
   shopId,
   productIds,
+  pathToRevalidate,
 }: {
   shopId: number;
   productIds: number[];
+  pathToRevalidate?: string;
 }) => {
   const session = await auth();
 
@@ -307,4 +310,8 @@ export const deleteProducts = async ({
       },
     },
   });
+
+  if (pathToRevalidate) {
+    revalidatePath(pathToRevalidate);
+  }
 };
