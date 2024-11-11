@@ -11,6 +11,7 @@ import { numberOnly } from "@/utils/number-only";
 import FileUpload from "./FileUpload";
 import { ProductType } from "@/app/admin/data-layer/product";
 import Header from "./Header";
+import PricingStock from "./PricingStock";
 
 const initialProduct: ProductType = {
   title: "",
@@ -90,48 +91,7 @@ const ProductForm = ({
       <div className="flex gap-5">
         <div className="basis-2/3 flex flex-col gap-5">
           <GeneralInfo product={productData} setProduct={setProductData} />
-          <ContainerBox>
-            <div className="font-semibold text-lg mb-2">Pricing and stock</div>
-            <div className="flex gap-3 basis-full">
-              <InputText
-                label="Base pricing"
-                onChange={(val) =>
-                  setProductData({ ...productData, basePrice: numberOnly(val) })
-                }
-                value={productData.basePrice ?? ""}
-                placeholder="Base pricing"
-              />
-              <InputText
-                label="Stock"
-                placeholder="Stock"
-                onChange={(val) =>
-                  setProductData({ ...productData, stock: numberOnly(val) })
-                }
-                value={productData.stock ?? ""}
-              />
-            </div>
-            <div className="flex gap-3 basis-full">
-              <InputText
-                label="Discount"
-                onChange={(val) =>
-                  setProductData({ ...productData, discount: numberOnly(val) })
-                }
-                value={productData.discount ?? ""}
-                placeholder="Discount"
-              />
-              <InputText
-                onChange={(val) =>
-                  setProductData({
-                    ...productData,
-                    sku: generateSlug(String(val)),
-                  })
-                }
-                label="SKU"
-                value={productData.sku}
-                placeholder="SKU"
-              />
-            </div>
-          </ContainerBox>
+          <PricingStock product={productData} setProduct={setProductData} />
         </div>
         <div className="basis-1/3 flex flex-col gap-5">
           <FileUpload

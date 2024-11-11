@@ -36,6 +36,35 @@ const Category = ({ categories, product, setProduct }: CategoryProps) => {
     }
   };
 
+  const onSelectCategoryTwo = (selectedId: string) => {
+    const selectedCategory = categories.find(
+      (c) => c.id === Number(selectedId),
+    );
+
+    if (!selectedCategory) {
+      return;
+    }
+
+    const { id, title } = selectedCategory;
+
+    if (selectedCategories?.some((c) => c.id === Number(selectedId))) {
+      setProduct({
+        ...product,
+        selectedCategories: selectedCategories.filter(
+          (c) => c.id !== Number(selectedId),
+        ),
+      });
+    } else {
+      setProduct({
+        ...product,
+        selectedCategories: [
+          ...(product.selectedCategories || []),
+          { id, title },
+        ],
+      });
+    }
+  };
+
   const onUnselectCategory = (id: number | undefined, title: string) => {
     setProduct({
       ...product,
@@ -60,29 +89,22 @@ const Category = ({ categories, product, setProduct }: CategoryProps) => {
   return (
     <ContainerBox>
       <div className="font-semibold text-lg">Category</div>
-      <Select>
+      <Select onValueChange={onSelectCategoryTwo}>
         <SelectTrigger className="bg-white">
           <SelectValue placeholder="Select a category" />
         </SelectTrigger>
         <SelectContent>
-          {categories
-            .filter((c) => !selectedCategories?.some((s) => s.id === c.id))
-            .map((category) => (
-              <SelectItem key={category.id} value={String(category.id)}>
-                {category.title}
-              </SelectItem>
-            ))}
+          {categories.map((category) => (
+            <SelectItem
+              key={category.id}
+              selected={selectedCategories?.some((s) => s.id === category.id)}
+              value={String(category.id)}
+            >
+              {category.title}
+            </SelectItem>
+          ))}
         </SelectContent>
       </Select>
-      <Dropdown
-        options={categories
-          .filter((c) => !selectedCategories?.some((s) => s.id === c.id))
-          .map((category) => ({
-            label: category.title,
-            value: String(category.id),
-          }))}
-        onChange={onSelectCategory}
-      />
       <div className="flex text-sm gap-2 flex-wrap">
         {selectedCategories?.map((s, i) => (
           <div

@@ -10,6 +10,7 @@ const NewCategory = ({ onAdd }: { onAdd: (category: string) => void }) => {
       <Input
         onChange={(evt) => setNewCategory(evt.currentTarget.value)}
         placeholder="Category name"
+        className="bg-white"
         value={newCategory}
       />
       <Button onClick={() => onAdd(newCategory)}>Add new Category</Button>
