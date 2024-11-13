@@ -30,6 +30,9 @@ export const columns: ColumnDef<Product>[] = [
     ),
     enableSorting: false,
     enableHiding: false,
+    meta: {
+      headerClassName: "w-[40px]",
+    },
   },
   {
     accessorKey: "title",
@@ -53,6 +56,7 @@ export const columns: ColumnDef<Product>[] = [
         </Link>
       );
     },
+    enableHiding: false,
   },
   {
     accessorKey: "basePrice",
@@ -77,5 +81,6 @@ export const columns: ColumnDef<Product>[] = [
       const product = row.original;
       return <ContextActions productId={product.id} />;
     },
+    enableHiding: false,
   },
 ];
