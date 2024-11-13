@@ -2,6 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { useSession } from "next-auth/react";
+import Page from "../_components/Page";
 
 export default function Dashboard() {
   const session = useSession();
@@ -9,14 +10,10 @@ export default function Dashboard() {
     redirect("/api/auth/signin");
   }
 
-  if (session.status === "loading") {
-    return <>...Loading</>;
-  }
-
   return (
-    <div>
+    <Page>
       <h1>Protected Dashboard</h1>
       <p>Welcome!</p>
-    </div>
+    </Page>
   );
 }

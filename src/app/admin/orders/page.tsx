@@ -2,6 +2,7 @@ import { auth } from "@/utils/auth";
 import { redirect } from "next/navigation";
 import OrdersTable from "./OrdersTable";
 import { getOrders } from "@/app/admin/data-layer/order";
+import Page from "../_components/Page";
 
 export default async function OrdersRoute() {
   const session = await auth();
@@ -12,5 +13,9 @@ export default async function OrdersRoute() {
 
   const orders = await getOrders({ shopId: 1 });
 
-  return <OrdersTable orders={orders} />;
+  return (
+    <Page breadcrumb={{ currentPage: "Orders" }}>
+      <OrdersTable orders={orders} />
+    </Page>
+  );
 }

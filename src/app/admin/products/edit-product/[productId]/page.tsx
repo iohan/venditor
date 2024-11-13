@@ -4,6 +4,7 @@ import { auth } from "@/utils/auth";
 import { getProduct } from "@/app/admin/data-layer/product";
 import ProductForm from "../../_components/ProductForm";
 import { submitUpdateProduct } from "./actions";
+import Page from "@/app/admin/_components/Page";
 
 export default async function EditProduct({
   params,
@@ -32,11 +33,18 @@ export default async function EditProduct({
   }
 
   return (
-    <ProductForm
-      product={product}
-      type={"edit"}
-      action={submitUpdateProduct}
-      categories={categories}
-    />
+    <Page
+      breadcrumb={{
+        currentPage: "Edit product",
+        tree: [{ title: "Products", href: "/admin/products" }],
+      }}
+    >
+      <ProductForm
+        product={product}
+        type={"edit"}
+        action={submitUpdateProduct}
+        categories={categories}
+      />
+    </Page>
   );
 }

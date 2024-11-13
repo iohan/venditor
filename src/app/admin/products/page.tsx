@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { getProducts } from "@/app/admin/data-layer/product";
 import { ProductTable } from "./ProductTable";
 import { columns } from "./table-columns";
+import Page from "../_components/Page";
 
 export default async function Products() {
   const session = await auth();
@@ -13,5 +14,9 @@ export default async function Products() {
 
   const products = await getProducts({ shopId: 1 });
 
-  return <ProductTable columns={columns} data={products} />;
+  return (
+    <Page breadcrumb={{ currentPage: "Products" }}>
+      <ProductTable columns={columns} data={products} />
+    </Page>
+  );
 }
