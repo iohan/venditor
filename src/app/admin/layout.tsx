@@ -17,6 +17,7 @@ import { auth } from "@/utils/auth";
 import { ReactNode } from "react";
 import { getShopInfo } from "./data-layer/shop";
 import { redirect } from "next/navigation";
+import { Toaster } from "@/components/ui/toaster";
 
 export default async function Page({ children }: { children: ReactNode }) {
   const session = await auth();
@@ -27,28 +28,31 @@ export default async function Page({ children }: { children: ReactNode }) {
   const shop = await getShopInfo({ shopId: 1 });
 
   return (
-    <SidebarProvider>
-      <AppSidebar user={session.user} shop={shop} />
-      <SidebarInset>
-        <header className="flex h-16 shrink-0 items-center gap-2">
-          <div className="flex items-center gap-2 px-4">
-            <SidebarTrigger className="-ml-1" />
-            <Separator orientation="vertical" className="mr-2 h-4" />
-            <Breadcrumb>
-              <BreadcrumbList>
-                <BreadcrumbItem className="hidden md:block">
-                  <BreadcrumbLink href="#">Dashboard</BreadcrumbLink>
-                </BreadcrumbItem>
-                <BreadcrumbSeparator className="hidden md:block" />
-                <BreadcrumbItem>
-                  <BreadcrumbPage>Products</BreadcrumbPage>
-                </BreadcrumbItem>
-              </BreadcrumbList>
-            </Breadcrumb>
-          </div>
-        </header>
-        <div className="flex flex-1 flex-col gap-4 p-5 pt-0">{children}</div>
-      </SidebarInset>
-    </SidebarProvider>
+    <>
+      <SidebarProvider>
+        <AppSidebar user={session.user} shop={shop} />
+        <SidebarInset>
+          <header className="flex h-16 shrink-0 items-center gap-2">
+            <div className="flex items-center gap-2 px-4">
+              <SidebarTrigger className="-ml-1" />
+              <Separator orientation="vertical" className="mr-2 h-4" />
+              <Breadcrumb>
+                <BreadcrumbList>
+                  <BreadcrumbItem className="hidden md:block">
+                    <BreadcrumbLink href="#">Dashboard</BreadcrumbLink>
+                  </BreadcrumbItem>
+                  <BreadcrumbSeparator className="hidden md:block" />
+                  <BreadcrumbItem>
+                    <BreadcrumbPage>Products</BreadcrumbPage>
+                  </BreadcrumbItem>
+                </BreadcrumbList>
+              </Breadcrumb>
+            </div>
+          </header>
+          <div className="flex flex-1 flex-col gap-4 p-5 pt-0">{children}</div>
+        </SidebarInset>
+      </SidebarProvider>
+      <Toaster />
+    </>
   );
 }

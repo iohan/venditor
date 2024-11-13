@@ -6,10 +6,12 @@ import { auth } from "@/utils/auth";
 import { computeFileChecksum } from "@/utils/compute-file-checksum";
 import { redirect } from "next/navigation";
 import { addCategories } from "@/app/admin/data-layer/category";
+import { revalidatePath } from "next/cache";
 
 export const submitNewProduct = async (
   product: ProductType,
   mediaFormData: FormData,
+  options?: { pathToRevalidate?: string },
 ) => {
   const session = await auth();
 
@@ -92,5 +94,8 @@ export const submitNewProduct = async (
     selectedCategories: [...selectedCategoryIds, ...newCategoryIds],
   });
 
+  if (options?.pathToRevalidate) {
+    revalidatePath(options.pathToRevalidate);
+  }
   return { status: "success", message: "New product successfully added" };
 };

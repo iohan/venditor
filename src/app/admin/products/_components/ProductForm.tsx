@@ -3,15 +3,13 @@
 import { Category } from "@prisma/client";
 import { FormEvent, useEffect, useRef, useState } from "react";
 import GeneralInfo from "./GeneralInfo";
-import ContainerBox from "../../_components/ContainerBox";
-import InputText from "@/components/form/InputText";
 import SelectCategory from "./SelectCategory";
-import { generateSlug } from "@/utils/slug";
-import { numberOnly } from "@/utils/number-only";
 import FileUpload from "./FileUpload";
 import { ProductType } from "@/app/admin/data-layer/product";
 import Header from "./Header";
 import PricingStock from "./PricingStock";
+import { useToast } from "@/hooks/use-toast";
+import { useRouter } from "next/navigation";
 
 const initialProduct: ProductType = {
   title: "",
@@ -36,14 +34,18 @@ const ProductForm = ({
   action: (
     productData: ProductType,
     uploadedMedia: FormData,
+    options?: { pathToRevalidate?: string },
   ) => Promise<unknown>;
   categories: Category[];
   type: "add" | "edit";
 }) => {
+  const { toast } = useToast();
+  const router = useRouter();
   const [changesMade, setChangesMade] = useState<boolean>(type == "add");
   const [productData, setProductData] = useState<ProductType>(
     product ?? initialProduct,
   );
+  const [submitInProgress, setSubmitInProgress] = useState(false);
 
   const initialProductRef = useRef<ProductType>(product ?? initialProduct);
   const initialMediaFilesRef = useRef<File[]>([]);
@@ -52,6 +54,7 @@ const ProductForm = ({
 
   const handleOnSubmit = async (evt: FormEvent<HTMLFormElement>) => {
     evt.preventDefault();
+    setSubmitInProgress(true);
 
     const uploadedMedia = new FormData();
 
@@ -60,14 +63,20 @@ const ProductForm = ({
     });
 
     try {
-      const response = await action(productData, uploadedMedia);
-      console.log(response);
+      await action(productData, uploadedMedia, {
+        pathToRevalidate: "/admin/products",
+      });
     } catch (error) {
       console.error(error);
     } finally {
-      if (evt.currentTarget) {
-        evt.currentTarget.reset();
-      }
+      router.push("/admin/products");
+      toast({
+        description:
+          type === "add"
+            ? "Your product was successfully created!"
+            : "Your product was successfully updated!",
+        variant: "success",
+      });
     }
   };
 
@@ -87,7 +96,13 @@ const ProductForm = ({
 
   return (
     <form onSubmit={handleOnSubmit}>
-      <Header type={type} draft={productData.draft} changesMade={changesMade} />
+      <Header
+        type={type}
+        draft={productData.draft}
+        changesMade={changesMade}
+        setSubmitInProgress={setSubmitInProgress}
+        state={{ changesMade, submitInProgress }}
+      />
       <div className="flex gap-5">
         <div className="basis-2/3 flex flex-col gap-5">
           <GeneralInfo product={productData} setProduct={setProductData} />

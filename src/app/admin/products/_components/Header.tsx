@@ -1,14 +1,21 @@
 import { Button } from "@/components/ui/button";
-import { BookDashed, Check, LayoutList } from "lucide-react";
+import { BookDashed, Check, LayoutList, Loader2 } from "lucide-react";
 
 const Header = ({
   type,
   draft,
   changesMade,
+  setSubmitInProgress,
+  state,
 }: {
   type: "edit" | "add";
   draft: boolean;
   changesMade: boolean;
+  setSubmitInProgress: (val: boolean) => void;
+  state: {
+    changesMade: boolean;
+    submitInProgress: boolean;
+  };
 }) => {
   return (
     <div className="flex justify-between mb-5">
@@ -31,8 +38,13 @@ const Header = ({
           </Button>
         )}
         {changesMade && (
-          <Button type="submit">
-            {type === "add" ? "Add Product" : "Update Product"} <Check />
+          <Button type="submit" disabled={state.submitInProgress}>
+            {type === "add" ? "Add Product" : "Update Product"}
+            {state.submitInProgress ? (
+              <Loader2 className="animate-spin" />
+            ) : (
+              <Check />
+            )}
           </Button>
         )}
       </div>
