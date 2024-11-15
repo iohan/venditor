@@ -39,7 +39,7 @@ interface DataTableProps<TData, TValue> {
   data: TData[];
 }
 
-export function ProductTable<TData, TValue>({
+export function DataTable<TData, TValue>({
   columns,
   data,
 }: DataTableProps<TData, TValue>) {
@@ -77,9 +77,9 @@ export function ProductTable<TData, TValue>({
       <div className="flex items-center justify-between py-4 gap-4">
         <Input
           placeholder="Filter products..."
-          value={(table.getColumn("title")?.getFilterValue() as string) ?? ""}
+          value={(table.getColumn("id")?.getFilterValue() as string) ?? ""}
           onChange={(event) =>
-            table.getColumn("title")?.setFilterValue(event.target.value)
+            table.getColumn("id")?.setFilterValue(event.target.value)
           }
           className="max-w-sm"
         />

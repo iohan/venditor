@@ -6,18 +6,19 @@ import { redirect } from "next/navigation";
 
 export interface Order {
   id: number;
-  orderNumber: number;
   shopId: number;
+  orderNumber: number;
   created: Date;
   customer: string;
   totalPrice: number;
   itemCount: number;
 }
 
-export const getOrders = async (input: {
+export const getOrders = async ({
+  shopId,
+}: {
   shopId: number;
 }): Promise<Order[]> => {
-  const { shopId } = input;
   const session = await auth();
 
   if (!session) {

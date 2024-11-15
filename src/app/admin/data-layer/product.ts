@@ -79,7 +79,6 @@ export const getProductMediaFiles = async ({
       }
     : { mediaFiles: [] };
 };
-
 export const getProducts = async ({ shopId }: { shopId: number }) => {
   const session = await auth();
 

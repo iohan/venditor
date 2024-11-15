@@ -5,13 +5,11 @@ const Header = ({
   type,
   draft,
   changesMade,
-  setSubmitInProgress,
   state,
 }: {
   type: "edit" | "add";
   draft: boolean;
   changesMade: boolean;
-  setSubmitInProgress: (val: boolean) => void;
   state: {
     changesMade: boolean;
     submitInProgress: boolean;

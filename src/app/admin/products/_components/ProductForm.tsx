@@ -100,7 +100,6 @@ const ProductForm = ({
         type={type}
         draft={productData.draft}
         changesMade={changesMade}
-        setSubmitInProgress={setSubmitInProgress}
         state={{ changesMade, submitInProgress }}
       />
       <div className="flex gap-5">

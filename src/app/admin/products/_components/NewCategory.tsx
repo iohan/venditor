@@ -13,7 +13,9 @@ const NewCategory = ({ onAdd }: { onAdd: (category: string) => void }) => {
         className="bg-white"
         value={newCategory}
       />
-      <Button onClick={() => onAdd(newCategory)}>Add new Category</Button>
+      <Button type="button" onClick={() => onAdd(newCategory)}>
+        Add new Category
+      </Button>
     </>
   );
 };

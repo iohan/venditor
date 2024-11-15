@@ -1,8 +1,9 @@
 import { auth } from "@/utils/auth";
 import { redirect } from "next/navigation";
-import OrdersTable from "./OrdersTable";
-import { getOrders } from "@/app/admin/data-layer/order";
+import { getOrders, Order } from "@/app/admin/data-layer/order";
 import Page from "../_components/Page";
+import { DataTable } from "../_components/DataTable";
+import { columns } from "./table-columns";
 
 export default async function OrdersRoute() {
   const session = await auth();
@@ -11,11 +12,11 @@ export default async function OrdersRoute() {
     redirect("/api/auth/signin");
   }
 
-  const orders = await getOrders({ shopId: 1 });
+  const orders: Order[] = await getOrders({ shopId: 1 });
 
   return (
     <Page breadcrumb={{ currentPage: "Orders" }}>
-      <OrdersTable orders={orders} />
+      <DataTable columns={columns} data={orders} />
     </Page>
   );
 }

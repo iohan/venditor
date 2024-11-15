@@ -21,22 +21,7 @@ interface CategoryProps {
 const Category = ({ categories, product, setProduct }: CategoryProps) => {
   const selectedCategories = product.selectedCategories;
 
-  const onSelectCategory = (category: DropdownOption) => {
-    const id = Number(category.value);
-    const title = category.label;
-
-    if (!selectedCategories?.some((c) => c.id === id)) {
-      setProduct({
-        ...product,
-        selectedCategories: [
-          ...(product.selectedCategories || []),
-          { id, title },
-        ],
-      });
-    }
-  };
-
-  const onSelectCategoryTwo = (selectedId: string) => {
+  const onSelectCategory = (selectedId: string) => {
     const selectedCategory = categories.find(
       (c) => c.id === Number(selectedId),
     );
@@ -89,7 +74,7 @@ const Category = ({ categories, product, setProduct }: CategoryProps) => {
   return (
     <ContainerBox>
       <div className="font-semibold text-lg">Category</div>
-      <Select onValueChange={onSelectCategoryTwo}>
+      <Select onValueChange={onSelectCategory}>
         <SelectTrigger className="bg-white">
           <SelectValue placeholder="Select a category" />
         </SelectTrigger>
